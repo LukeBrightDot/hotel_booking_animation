@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { Mic, MicOff, Volume2, VolumeX, LogIn, UserPlus } from 'lucide-react';
 import { ParticleVisualization } from './ParticleVisualization';
 import { AnimatedTranscript } from './AnimatedTranscript';
 import { FloatingLocations } from './FloatingLocations';
 import { ResortCard, type Resort } from './ResortCard';
 import { type VoiceActivityLevel } from '@/lib/animations';
+import { Button } from '@/components/ui/button';
 
 export type DemoState = 'idle' | 'listening' | 'speaking' | 'searching' | 'results';
 
@@ -111,8 +113,58 @@ export const VoiceAssistantLayout: React.FC<VoiceAssistantLayoutProps> = ({
   // Determine if visualization should be in "compact" mode (when showing results)
   const isCompact = state === 'results' && showResults;
 
+  const [isMicMuted, setIsMicMuted] = useState(false);
+  const [isSpeakerMuted, setIsSpeakerMuted] = useState(false);
+
   return (
-    <div className={`min-h-screen bg-background flex flex-col items-center px-6 pt-16 ${className}`}>
+    <div className={`min-h-screen bg-background flex flex-col items-center px-6 pt-20 ${className}`}>
+      {/* Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-background/80 backdrop-blur-sm">
+        {/* Logo placeholder - left */}
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+            <span className="text-primary-foreground font-display text-sm font-semibold">V</span>
+          </div>
+          <span className="font-display text-lg tracking-wide text-foreground">Voyage</span>
+        </div>
+
+        {/* Auth buttons - right */}
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+            <LogIn className="w-4 h-4 mr-2" />
+            Login
+          </Button>
+          <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <UserPlus className="w-4 h-4 mr-2" />
+            Join
+          </Button>
+        </div>
+      </header>
+
+      {/* Audio controls - fixed bottom right */}
+      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2">
+        <button
+          onClick={() => setIsMicMuted(!isMicMuted)}
+          className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 
+                     ${isMicMuted 
+                       ? 'bg-destructive/20 text-destructive hover:bg-destructive/30' 
+                       : 'bg-primary/10 text-primary hover:bg-primary/20'}`}
+          aria-label={isMicMuted ? 'Unmute microphone' : 'Mute microphone'}
+        >
+          {isMicMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+        </button>
+        <button
+          onClick={() => setIsSpeakerMuted(!isSpeakerMuted)}
+          className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300
+                     ${isSpeakerMuted 
+                       ? 'bg-destructive/20 text-destructive hover:bg-destructive/30' 
+                       : 'bg-primary/10 text-primary hover:bg-primary/20'}`}
+          aria-label={isSpeakerMuted ? 'Unmute speaker' : 'Mute speaker'}
+        >
+          {isSpeakerMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+        </button>
+      </div>
+
       {/* Main visualization area - moves up smoothly when results appear */}
       <div 
         className={`relative flex flex-col items-center w-full max-w-4xl transition-all duration-700 ease-out
