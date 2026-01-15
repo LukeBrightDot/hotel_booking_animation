@@ -21,7 +21,7 @@ export const StateToggle: React.FC<StateToggleProps> = ({
   className = '',
 }) => {
   return (
-    <div className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 ${className}`}>
+    <div className={`fixed top-20 left-1/2 -translate-x-1/2 z-40 ${className}`}>
       <div className="flex items-center gap-1 p-1.5 bg-card/80 backdrop-blur-xl rounded-full border border-border/50 shadow-soft">
         {STATES.map(({ value, label }) => (
           <button

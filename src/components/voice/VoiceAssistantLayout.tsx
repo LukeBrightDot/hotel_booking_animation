@@ -142,23 +142,23 @@ export const VoiceAssistantLayout: React.FC<VoiceAssistantLayoutProps> = ({
       </header>
 
       {/* Audio controls - fixed bottom right */}
-      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2">
+      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">
         <button
           onClick={() => setIsMicMuted(!isMicMuted)}
-          className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 
+          className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 shadow-md border
                      ${isMicMuted 
-                       ? 'bg-destructive/20 text-destructive hover:bg-destructive/30' 
-                       : 'bg-primary/10 text-primary hover:bg-primary/20'}`}
+                       ? 'bg-destructive/20 text-destructive hover:bg-destructive/30 border-destructive/30' 
+                       : 'bg-card text-primary hover:bg-primary/10 border-border'}`}
           aria-label={isMicMuted ? 'Unmute microphone' : 'Mute microphone'}
         >
           {isMicMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
         </button>
         <button
           onClick={() => setIsSpeakerMuted(!isSpeakerMuted)}
-          className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300
+          className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 shadow-md border
                      ${isSpeakerMuted 
-                       ? 'bg-destructive/20 text-destructive hover:bg-destructive/30' 
-                       : 'bg-primary/10 text-primary hover:bg-primary/20'}`}
+                       ? 'bg-destructive/20 text-destructive hover:bg-destructive/30 border-destructive/30' 
+                       : 'bg-card text-primary hover:bg-primary/10 border-border'}`}
           aria-label={isSpeakerMuted ? 'Unmute speaker' : 'Mute speaker'}
         >
           {isSpeakerMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
