@@ -1,5 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { getOrbitPosition, staggerDelay } from '@/lib/animations';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 
 const EXOTIC_LOCATIONS = [
   'Bali', 'Maldives', 'Santorini', 'Tokyo', 'Paris',
@@ -11,10 +10,12 @@ const EXOTIC_LOCATIONS = [
 interface FloatingLocation {
   id: number;
   name: string;
-  position: { x: number; y: number; angle: number };
+  angle: number;
+  radius: number;
   opacity: number;
   scale: number;
-  delay: number;
+  rotationSpeed: number;
+  phaseOffset: number;
 }
 
 interface FloatingLocationsProps {
@@ -29,64 +30,130 @@ export const FloatingLocations: React.FC<FloatingLocationsProps> = ({
   className = '',
 }) => {
   const [locations, setLocations] = useState<FloatingLocation[]>([]);
-  const [key, setKey] = useState(0);
+  const [visibleLocations, setVisibleLocations] = useState<FloatingLocation[]>([]);
+  const animationRef = useRef<number>(0);
+  const timeRef = useRef<number>(0);
 
+  // Generate initial locations distributed evenly around the circle
   const generateLocations = useCallback(() => {
     const shuffled = [...EXOTIC_LOCATIONS].sort(() => Math.random() - 0.5);
-    const selected = shuffled.slice(0, 5);
+    const count = 8; // Show 8 locations at a time
     
-    return selected.map((name, index) => ({
+    return shuffled.slice(0, count).map((name, index) => ({
       id: Date.now() + index,
       name,
-      position: getOrbitPosition(index, selected.length, radius, Math.random() * 0.5),
-      opacity: 0.6 + Math.random() * 0.4,
+      angle: (index / count) * Math.PI * 2 + Math.random() * 0.3,
+      radius: radius + (Math.random() - 0.5) * 60,
+      opacity: 0.5 + Math.random() * 0.5,
       scale: 0.85 + Math.random() * 0.3,
-      delay: staggerDelay(index, 200),
+      rotationSpeed: 0.0003 + Math.random() * 0.0002,
+      phaseOffset: Math.random() * Math.PI * 2,
     }));
   }, [radius]);
 
+  // Initialize locations when active
   useEffect(() => {
     if (!isActive) {
       setLocations([]);
+      setVisibleLocations([]);
       return;
     }
 
-    // Initial locations
-    setLocations(generateLocations());
+    const newLocations = generateLocations();
+    setLocations(newLocations);
+    
+    // Stagger the appearance
+    newLocations.forEach((loc, index) => {
+      setTimeout(() => {
+        setVisibleLocations(prev => [...prev, loc]);
+      }, index * 300);
+    });
 
-    // Refresh locations periodically
+    // Refresh some locations periodically
     const interval = setInterval(() => {
-      setKey(prev => prev + 1);
-      setLocations(generateLocations());
-    }, 4000);
+      setLocations(prev => {
+        const shuffled = [...EXOTIC_LOCATIONS].sort(() => Math.random() - 0.5);
+        // Replace 2-3 random locations
+        const newLocs = [...prev];
+        const replaceCount = 2 + Math.floor(Math.random() * 2);
+        
+        for (let i = 0; i < replaceCount; i++) {
+          const replaceIndex = Math.floor(Math.random() * newLocs.length);
+          const newName = shuffled.find(n => !newLocs.some(l => l.name === n)) || shuffled[0];
+          
+          newLocs[replaceIndex] = {
+            ...newLocs[replaceIndex],
+            id: Date.now() + i,
+            name: newName,
+            opacity: 0, // Start faded out
+          };
+        }
+        
+        return newLocs;
+      });
+    }, 3000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
   }, [isActive, generateLocations]);
+
+  // Animation loop for smooth orbital movement
+  useEffect(() => {
+    if (!isActive || locations.length === 0) return;
+
+    const animate = () => {
+      timeRef.current += 16; // ~60fps
+      
+      setLocations(prev => prev.map(loc => ({
+        ...loc,
+        angle: loc.angle + loc.rotationSpeed * 16,
+        // Fade in new locations
+        opacity: Math.min(loc.opacity + 0.02, 0.5 + Math.random() * 0.3),
+      })));
+
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [isActive, locations.length]);
 
   if (!isActive) return null;
 
   return (
-    <div 
-      className={`absolute inset-0 pointer-events-none ${className}`}
-      key={key}
-    >
-      {locations.map((location) => (
-        <div
-          key={location.id}
-          className="absolute left-1/2 top-1/2 animate-location-fade"
-          style={{
-            transform: `translate(-50%, -50%) translate(${location.position.x}px, ${location.position.y}px) scale(${location.scale})`,
-            animationDelay: `${location.delay}ms`,
-          }}
-        >
-          <span 
-            className="text-elegant text-xs tracking-[0.2em] text-muted-foreground/60 whitespace-nowrap"
-            style={{ opacity: location.opacity }}
+    <div className={`absolute inset-0 pointer-events-none overflow-visible ${className}`}>
+      {locations.map((location) => {
+        const x = Math.cos(location.angle) * location.radius;
+        const y = Math.sin(location.angle) * location.radius;
+        const pulse = Math.sin(timeRef.current * 0.002 + location.phaseOffset) * 0.1 + 1;
+        
+        return (
+          <div
+            key={location.id}
+            className="absolute left-1/2 top-1/2 transition-opacity duration-1000"
+            style={{
+              transform: `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${location.scale * pulse})`,
+              opacity: location.opacity,
+            }}
           >
-            {location.name}
-          </span>
-        </div>
-      ))}
+            <span 
+              className="text-elegant text-xs tracking-[0.2em] text-muted-foreground/70 whitespace-nowrap
+                         transition-all duration-500"
+            >
+              {location.name}
+            </span>
+          </div>
+        );
+      })}
     </div>
   );
 };
