@@ -532,9 +532,26 @@ Replace `ResortCard` with your own component matching your data structure.
 - Ensure Tailwind config includes the color definitions
 - Check HSL format (no `hsl()` wrapper in CSS vars)
 
+### Page looks unstyled (white background, default fonts)
+
+This is the **most common issue**. It means the CSS variables and fonts are not being loaded.
+
+**Solution 1: Use the standalone CSS file**
+1. Copy `VOICE_ASSISTANT_STYLES.css` to your `src/` directory
+2. Import it in `main.tsx` or `App.tsx`:
+   ```tsx
+   import './VOICE_ASSISTANT_STYLES.css';
+   ```
+
+**Solution 2: Manual verification**
+Run through the `INTEGRATION_CHECKLIST.md` to diagnose which piece is missing.
+
 ## Files to Copy (Quick Reference)
 
 ```
+VOICE_ASSISTANT_STYLES.css        # NEW: Standalone CSS (use if styles don't work)
+INTEGRATION_CHECKLIST.md          # NEW: Diagnostic checklist
+
 src/lib/animations.ts
 src/components/voice/VoiceAssistantLayout.tsx
 src/components/voice/ParticleVisualization.tsx
@@ -546,3 +563,89 @@ src/components/voice/index.ts
 ```
 
 Plus CSS additions to `index.css` and `tailwind.config.ts`.
+
+---
+
+## Claude Code Integration Prompt
+
+Use this exact prompt to have Claude Code integrate the voice assistant UI:
+
+```
+## Task: Integrate Voice Assistant UI from hotel-booking-animation
+
+I need you to integrate the Voice Assistant UI from this repository:
+https://github.com/LukeBrightDot/hotel-booking-animation
+
+### CRITICAL: This is a dark-themed, luxury-styled UI. The result must have:
+- Near-black background with warm brown tint (NOT white)
+- Elegant serif font (Cormorant Garamond) for headings
+- Clean sans-serif font (Inter) for body text
+- Warm gold accent colors
+- Animated particle visualization
+- Glassmorphic effects
+
+### Step-by-Step Integration (FOLLOW IN ORDER):
+
+**Step 1: Add Google Fonts to index.html**
+Add this to the <head> section:
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+```
+
+**VERIFY:** Open the page, go to DevTools → Network, filter by "fonts" - you should see font files loading.
+
+**Step 2: Copy the standalone CSS file**
+Copy `VOICE_ASSISTANT_STYLES.css` from the source repo to your `src/` directory.
+Import it in `main.tsx` AFTER your existing imports:
+```tsx
+import './index.css';
+import './VOICE_ASSISTANT_STYLES.css'; // Add this line
+```
+
+**VERIFY:** The page background should now be very dark brown/black, not white.
+
+**Step 3: Update tailwind.config.ts**
+Copy the theme extensions from the source repo's `tailwind.config.ts`, specifically:
+- colors (background, foreground, primary, secondary, muted, accent, gold, etc.)
+- fontFamily (serif: Cormorant Garamond, sans: Inter)
+- borderRadius
+
+**Step 4: Copy component files**
+Copy these directories/files from the source repo:
+- `src/components/voice/` (entire directory)
+- `src/lib/animations.ts`
+
+**Step 5: Verify the integration**
+Run through `INTEGRATION_CHECKLIST.md` from the source repo.
+
+### Expected Visual Result:
+- Dark brown/black background
+- Animated gold particles in the center
+- Elegant serif text for transcripts
+- Floating location names during search state
+- Resort cards with hover effects
+- Overall luxury hotel aesthetic
+
+### If the page still looks unstyled:
+1. Check browser console for CSS errors
+2. Verify fonts are loading in Network tab
+3. Check that CSS variables are defined (DevTools → Computed → filter "--background")
+4. Make sure VOICE_ASSISTANT_STYLES.css is imported AFTER index.css
+
+DO NOT consider this task complete until the visual result matches the source repository.
+Take a screenshot of the source (https://hotel-booking-animation.lovable.app) and compare.
+```
+
+---
+
+## Alternative: Fork in Lovable
+
+If integration continues to fail, the easiest approach is:
+
+1. Go to https://lovable.dev
+2. Create a new project by importing: `https://github.com/LukeBrightDot/hotel-booking-animation`
+3. This creates an exact working copy
+4. Connect your own GitHub repository
+5. Push changes to sync
