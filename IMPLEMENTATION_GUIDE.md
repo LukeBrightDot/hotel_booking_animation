@@ -1,6 +1,6 @@
 # Voice Assistant UI - Implementation Guide
 
-This guide explains how to implement the voice assistant visualization UI in another React/Tailwind project.
+This guide explains how to implement the voice assistant visualization UI in another React/Tailwind project, including complete layout structure, positioning, and sizing.
 
 ## Prerequisites
 
@@ -276,7 +276,135 @@ Copy all files from `src/components/voice/` to your project.
 | `ResortCard.tsx` | Result card with hover effects |
 | `StateToggle.tsx` | Optional: demo controls to switch states |
 
-### Step 5: Basic Usage
+### Step 5: Layout Structure & Sizing
+
+The layout uses a **fixed header + flexible main content + fixed controls** pattern:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  HEADER (fixed top, z-50, h-auto ~64px)                     │
+│  ├── Logo (left)                                            │
+│  └── Auth buttons (right)                                   │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│                   MAIN CONTENT AREA                         │
+│                   (min-h-screen, pt-20)                     │
+│                                                             │
+│              ┌─────────────────────┐                        │
+│              │  Status Indicator   │                        │
+│              │   (text-elegant)    │                        │
+│              └─────────────────────┘                        │
+│                                                             │
+│              ┌─────────────────────┐                        │
+│              │                     │                        │
+│              │  Particle Viz       │                        │
+│              │  (350px default)    │                        │
+│              │                     │                        │
+│              └─────────────────────┘                        │
+│                                                             │
+│              ┌─────────────────────┐                        │
+│              │  Transcript Area    │                        │
+│              │  (max-w-2xl)        │                        │
+│              └─────────────────────┘                        │
+│                                                             │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │  RESULTS GRID (max-w-5xl, 1-3 columns responsive)   │    │
+│  │  grid-cols-1 → md:grid-cols-2 → lg:grid-cols-3      │    │
+│  └─────────────────────────────────────────────────────┘    │
+│                                                             │
+│                    [Voyage AI branding]                     │
+│                    (absolute bottom-6)                      │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+                                              ┌───────────────┐
+                                              │ Audio Controls│
+                                              │ (fixed        │
+                                              │  bottom-6     │
+                                              │  right-6)     │
+                                              └───────────────┘
+```
+
+#### Key Layout Classes
+
+**Root Container:**
+```tsx
+<div className="min-h-screen bg-background flex flex-col items-center px-6 pt-20">
+```
+- `min-h-screen`: Full viewport height minimum
+- `pt-20`: 80px top padding (clears fixed header)
+- `px-6`: 24px horizontal padding
+
+**Fixed Header:**
+```tsx
+<header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-background/80 backdrop-blur-sm">
+```
+- `fixed top-0 left-0 right-0`: Spans full width at top
+- `z-50`: Above all other content
+- `py-4`: 16px vertical padding (~64px total height with content)
+- `bg-background/80 backdrop-blur-sm`: Semi-transparent with blur
+
+**Audio Controls:**
+```tsx
+<div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">
+  <button className="w-12 h-12 rounded-full ...">
+```
+- `fixed bottom-6 right-6`: 24px from bottom-right corner
+- `w-12 h-12`: 48px circular buttons
+- `gap-3`: 12px spacing between buttons
+
+**Main Visualization Area:**
+```tsx
+<div className="relative flex flex-col items-center w-full max-w-4xl transition-all duration-700 ease-out
+               ${isCompact ? 'flex-none' : 'flex-1 justify-center'}">
+```
+- `max-w-4xl`: 896px max width
+- `flex-1 justify-center`: Centers vertically when not showing results
+- `flex-none`: Shrinks when results appear
+
+**Particle Visualization:**
+```tsx
+<ParticleVisualization 
+  activity={getActivity()} 
+  voiceIntensity={voiceIntensity}
+  size={350}  // 350px canvas
+/>
+```
+- Scales down to 75% (`scale-75`) when showing results
+
+**Transcript Area:**
+```tsx
+<div className="max-w-2xl w-full min-h-[80px] flex items-center justify-center
+               ${isCompact ? 'mt-0 mb-6' : 'mt-8 mb-12'}">
+```
+- `max-w-2xl`: 672px max width
+- `min-h-[80px]`: Prevents layout shift
+
+**Results Grid:**
+```tsx
+<div className="w-full max-w-5xl px-4 pb-16">
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+```
+- `max-w-5xl`: 1024px max width
+- `gap-6`: 24px grid gaps
+- Responsive: 1 col → 2 cols (768px+) → 3 cols (1024px+)
+
+**Bottom Branding:**
+```tsx
+<div className="absolute bottom-6 left-1/2 -translate-x-1/2">
+```
+- Centered horizontally, 24px from bottom
+
+#### Z-Index Layering
+
+| Element | Z-Index | Purpose |
+|---------|---------|---------|
+| Header | `z-50` | Always on top |
+| Audio Controls | `z-50` | Always visible |
+| State Toggle (optional) | `z-40` | Below header |
+| Floating Locations | default | Within viz area |
+| Particle Canvas | default | Base layer |
+
+### Step 6: Basic Usage
 
 ```tsx
 import { VoiceAssistantLayout } from '@/components/voice';
@@ -299,7 +427,7 @@ function App() {
 }
 ```
 
-### Step 6: Integrating with Real Voice API
+### Step 7: Integrating with Real Voice API
 
 Replace the demo states with your actual voice SDK:
 
