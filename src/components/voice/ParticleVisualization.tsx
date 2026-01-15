@@ -1,12 +1,21 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 import { 
   PARTICLE_CONFIG, 
-  PARTICLE_COLORS, 
   hslColor, 
   lerp, 
   clamp,
   type VoiceActivityLevel 
 } from '@/lib/animations';
+
+// Multi-color palette: gold, navy blue, royal green, and warm tones
+const PARTICLE_PALETTES = {
+  gold: { h: 42, s: 65, l: 58 },
+  navy: { h: 220, s: 60, l: 35 },
+  royalGreen: { h: 160, s: 45, l: 40 },
+  rose: { h: 15, s: 55, l: 70 },
+  champagne: { h: 35, s: 45, l: 75 },
+  coral: { h: 25, s: 50, l: 72 },
+};
 
 interface Particle {
   x: number;
@@ -16,19 +25,22 @@ interface Particle {
   vx: number;
   vy: number;
   radius: number;
-  color: { h: number; s: number; l: number };
+  colorIndex: number;
+  colorPhase: number;
   alpha: number;
   phase: number;
 }
 
 interface ParticleVisualizationProps {
   activity?: VoiceActivityLevel;
+  voiceIntensity?: number; // 0-1, simulates voice waveform
   size?: number;
   className?: string;
 }
 
 export const ParticleVisualization: React.FC<ParticleVisualizationProps> = ({
   activity = 'idle',
+  voiceIntensity = 0,
   size = 400,
   className = '',
 }) => {
@@ -37,18 +49,43 @@ export const ParticleVisualization: React.FC<ParticleVisualizationProps> = ({
   const animationRef = useRef<number>(0);
   const timeRef = useRef<number>(0);
   const activityRef = useRef<VoiceActivityLevel>(activity);
+  const voiceIntensityRef = useRef<number>(voiceIntensity);
+  const colorTimeRef = useRef<number>(0);
 
-  // Update activity ref when prop changes
+  // Update refs when props change
   useEffect(() => {
     activityRef.current = activity;
   }, [activity]);
+
+  useEffect(() => {
+    voiceIntensityRef.current = voiceIntensity;
+  }, [voiceIntensity]);
+
+  // Get interpolated color based on phase
+  const getColorForParticle = useCallback((colorPhase: number, time: number) => {
+    const colors = Object.values(PARTICLE_PALETTES);
+    const cycleTime = 8000; // Complete color cycle time in ms
+    const phase = ((time + colorPhase * 1000) % cycleTime) / cycleTime;
+    
+    const colorIndex = Math.floor(phase * colors.length);
+    const nextColorIndex = (colorIndex + 1) % colors.length;
+    const blendFactor = (phase * colors.length) % 1;
+    
+    const currentColor = colors[colorIndex];
+    const nextColor = colors[nextColorIndex];
+    
+    return {
+      h: lerp(currentColor.h, nextColor.h, blendFactor),
+      s: lerp(currentColor.s, nextColor.s, blendFactor),
+      l: lerp(currentColor.l, nextColor.l, blendFactor),
+    };
+  }, []);
 
   // Initialize particles
   const initParticles = useCallback((canvas: HTMLCanvasElement) => {
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
     const particles: Particle[] = [];
-    const colors = [PARTICLE_COLORS.primary, PARTICLE_COLORS.secondary, PARTICLE_COLORS.accent];
 
     for (let i = 0; i < PARTICLE_CONFIG.count; i++) {
       const angle = Math.random() * Math.PI * 2;
@@ -64,7 +101,8 @@ export const ParticleVisualization: React.FC<ParticleVisualizationProps> = ({
         vx: (Math.random() - 0.5) * 0.5,
         vy: (Math.random() - 0.5) * 0.5,
         radius: 1 + Math.random() * 2,
-        color: colors[Math.floor(Math.random() * colors.length)],
+        colorIndex: Math.floor(Math.random() * 6),
+        colorPhase: Math.random() * Math.PI * 2,
         alpha: 0.4 + Math.random() * 0.6,
         phase: Math.random() * Math.PI * 2,
       });
@@ -75,17 +113,44 @@ export const ParticleVisualization: React.FC<ParticleVisualizationProps> = ({
 
   // Get activity parameters
   const getActivityParams = useCallback(() => {
+    const voice = voiceIntensityRef.current;
+    const voiceBoost = voice * 0.5; // Voice intensity adds to all params
+    
     switch (activityRef.current) {
       case 'idle':
-        return { expansion: 1, speed: 0.5, brightness: 0.7, jitter: 0.3 };
+        return { 
+          expansion: 1 + voiceBoost * 0.1, 
+          speed: 0.5 + voiceBoost, 
+          brightness: 0.7 + voiceBoost * 0.2, 
+          jitter: 0.3 + voiceBoost * 0.5,
+          pulseStrength: 0.1 + voiceBoost * 0.3
+        };
       case 'listening':
-        return { expansion: 1.1, speed: 1, brightness: 0.85, jitter: 0.6 };
+        return { 
+          expansion: 1.1 + voiceBoost * 0.2, 
+          speed: 1 + voiceBoost * 1.5, 
+          brightness: 0.85 + voiceBoost * 0.15, 
+          jitter: 0.6 + voiceBoost * 0.8,
+          pulseStrength: 0.3 + voiceBoost * 0.5
+        };
       case 'speaking':
-        return { expansion: 1.3, speed: 1.5, brightness: 1, jitter: 1 };
+        return { 
+          expansion: 1.2 + voice * 0.4, 
+          speed: 1.5 + voice * 2, 
+          brightness: 0.9 + voice * 0.1, 
+          jitter: 0.8 + voice * 1.5,
+          pulseStrength: 0.5 + voice * 0.8
+        };
       case 'processing':
-        return { expansion: 1.15, speed: 2, brightness: 0.9, jitter: 0.8 };
+        return { 
+          expansion: 1.15, 
+          speed: 2, 
+          brightness: 0.9, 
+          jitter: 0.8,
+          pulseStrength: 0.4
+        };
       default:
-        return { expansion: 1, speed: 0.5, brightness: 0.7, jitter: 0.3 };
+        return { expansion: 1, speed: 0.5, brightness: 0.7, jitter: 0.3, pulseStrength: 0.1 };
     }
   }, []);
 
@@ -96,26 +161,30 @@ export const ParticleVisualization: React.FC<ParticleVisualizationProps> = ({
     const params = getActivityParams();
     
     timeRef.current += 0.016 * params.speed;
+    colorTimeRef.current += 16;
 
     // Clear canvas with slight fade for trail effect
-    ctx.fillStyle = 'hsla(30, 25%, 98%, 0.15)';
+    ctx.fillStyle = 'hsla(30, 25%, 98%, 0.12)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const particles = particlesRef.current;
+    const voice = voiceIntensityRef.current;
+
+    // Voice-reactive pulse wave
+    const voicePulse = Math.sin(timeRef.current * 8) * voice * 0.3;
 
     // Draw connections between nearby particles
-    ctx.strokeStyle = hslColor(15, 40, 70, 0.08);
-    ctx.lineWidth = 0.5;
-    
     for (let i = 0; i < particles.length; i++) {
       for (let j = i + 1; j < particles.length; j++) {
         const dx = particles[i].x - particles[j].x;
         const dy = particles[i].y - particles[j].y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         
-        if (dist < PARTICLE_CONFIG.connectionDistance) {
-          const alpha = (1 - dist / PARTICLE_CONFIG.connectionDistance) * 0.15 * params.brightness;
-          ctx.strokeStyle = hslColor(15, 40, 70, alpha);
+        if (dist < PARTICLE_CONFIG.connectionDistance * (1 + voice * 0.5)) {
+          const alpha = (1 - dist / PARTICLE_CONFIG.connectionDistance) * 0.12 * params.brightness;
+          const color = getColorForParticle((particles[i].colorPhase + particles[j].colorPhase) / 2, colorTimeRef.current);
+          ctx.strokeStyle = hslColor(color.h, color.s * 0.6, color.l + 20, alpha);
+          ctx.lineWidth = 0.5;
           ctx.beginPath();
           ctx.moveTo(particles[i].x, particles[i].y);
           ctx.lineTo(particles[j].x, particles[j].y);
@@ -126,66 +195,77 @@ export const ParticleVisualization: React.FC<ParticleVisualizationProps> = ({
 
     // Update and draw particles
     for (const particle of particles) {
+      // Get current color for this particle (smooth transition)
+      const particleColor = getColorForParticle(particle.colorPhase, colorTimeRef.current);
+      
       // Calculate distance from center
       const dx = particle.baseX - centerX;
       const dy = particle.baseY - centerY;
       const baseDistance = Math.sqrt(dx * dx + dy * dy);
       
-      // Breathing effect
+      // Breathing effect + voice pulse
       const breathe = Math.sin(timeRef.current * 0.8 + particle.phase) * 0.15 * params.expansion;
-      const targetDistance = baseDistance * (1 + breathe);
+      const voiceExpansion = voicePulse * (baseDistance / PARTICLE_CONFIG.baseRadius);
+      const targetDistance = baseDistance * (1 + breathe + voiceExpansion);
       
       // Calculate target position
       const angle = Math.atan2(dy, dx);
       const targetX = centerX + Math.cos(angle) * targetDistance;
       const targetY = centerY + Math.sin(angle) * targetDistance;
       
-      // Add jitter based on activity
-      const jitterX = Math.sin(timeRef.current * 3 + particle.phase) * params.jitter * 2;
-      const jitterY = Math.cos(timeRef.current * 3 + particle.phase * 1.5) * params.jitter * 2;
+      // Add jitter based on activity + voice
+      const jitterAmount = params.jitter * (1 + voice * 2);
+      const jitterX = Math.sin(timeRef.current * 3 + particle.phase) * jitterAmount * 2;
+      const jitterY = Math.cos(timeRef.current * 3 + particle.phase * 1.5) * jitterAmount * 2;
       
       // Smooth movement
-      particle.x = lerp(particle.x, targetX + jitterX, 0.05);
-      particle.y = lerp(particle.y, targetY + jitterY, 0.05);
+      particle.x = lerp(particle.x, targetX + jitterX, 0.08);
+      particle.y = lerp(particle.y, targetY + jitterY, 0.08);
 
-      // Pulsing alpha
-      const pulseAlpha = 0.5 + Math.sin(timeRef.current * 2 + particle.phase) * 0.3;
-      const finalAlpha = clamp(particle.alpha * pulseAlpha * params.brightness, 0.2, 1);
+      // Pulsing alpha with voice reactivity
+      const pulseAlpha = 0.5 + Math.sin(timeRef.current * 2 + particle.phase) * params.pulseStrength;
+      const voiceAlpha = voice * 0.3;
+      const finalAlpha = clamp(particle.alpha * (pulseAlpha + voiceAlpha) * params.brightness, 0.2, 1);
 
       // Draw particle with glow
+      const glowRadius = particle.radius * (2.5 + voice * 1.5);
       const gradient = ctx.createRadialGradient(
         particle.x, particle.y, 0,
-        particle.x, particle.y, particle.radius * 3
+        particle.x, particle.y, glowRadius
       );
-      gradient.addColorStop(0, hslColor(particle.color.h, particle.color.s, particle.color.l, finalAlpha));
-      gradient.addColorStop(0.4, hslColor(particle.color.h, particle.color.s, particle.color.l, finalAlpha * 0.5));
-      gradient.addColorStop(1, hslColor(particle.color.h, particle.color.s, particle.color.l, 0));
+      gradient.addColorStop(0, hslColor(particleColor.h, particleColor.s, particleColor.l, finalAlpha));
+      gradient.addColorStop(0.4, hslColor(particleColor.h, particleColor.s, particleColor.l, finalAlpha * 0.5));
+      gradient.addColorStop(1, hslColor(particleColor.h, particleColor.s, particleColor.l, 0));
 
       ctx.beginPath();
-      ctx.arc(particle.x, particle.y, particle.radius * 2.5, 0, Math.PI * 2);
+      ctx.arc(particle.x, particle.y, glowRadius, 0, Math.PI * 2);
       ctx.fillStyle = gradient;
       ctx.fill();
 
       // Core particle
       ctx.beginPath();
-      ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
-      ctx.fillStyle = hslColor(particle.color.h, particle.color.s, particle.color.l + 10, finalAlpha);
+      ctx.arc(particle.x, particle.y, particle.radius * (1 + voice * 0.5), 0, Math.PI * 2);
+      ctx.fillStyle = hslColor(particleColor.h, particleColor.s, particleColor.l + 15, finalAlpha);
       ctx.fill();
     }
 
-    // Central glow
-    const centerGlow = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 60 * params.expansion);
-    centerGlow.addColorStop(0, hslColor(15, 50, 85, 0.15 * params.brightness));
-    centerGlow.addColorStop(0.5, hslColor(25, 40, 80, 0.08 * params.brightness));
-    centerGlow.addColorStop(1, hslColor(35, 30, 75, 0));
+    // Central glow with color cycling
+    const centerColor = getColorForParticle(0, colorTimeRef.current);
+    const centerGlow = ctx.createRadialGradient(
+      centerX, centerY, 0, 
+      centerX, centerY, 60 * params.expansion * (1 + voice * 0.3)
+    );
+    centerGlow.addColorStop(0, hslColor(centerColor.h, centerColor.s * 0.5, centerColor.l + 20, 0.15 * params.brightness));
+    centerGlow.addColorStop(0.5, hslColor(centerColor.h, centerColor.s * 0.3, centerColor.l + 30, 0.08 * params.brightness));
+    centerGlow.addColorStop(1, hslColor(centerColor.h, centerColor.s * 0.2, centerColor.l + 40, 0));
     
     ctx.fillStyle = centerGlow;
     ctx.beginPath();
-    ctx.arc(centerX, centerY, 60 * params.expansion, 0, Math.PI * 2);
+    ctx.arc(centerX, centerY, 60 * params.expansion * (1 + voice * 0.3), 0, Math.PI * 2);
     ctx.fill();
 
     animationRef.current = requestAnimationFrame(() => animate(canvas, ctx));
-  }, [getActivityParams]);
+  }, [getActivityParams, getColorForParticle]);
 
   // Setup canvas and start animation
   useEffect(() => {

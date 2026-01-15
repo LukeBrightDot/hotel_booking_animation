@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { ParticleVisualization } from './ParticleVisualization';
 import { AnimatedTranscript } from './AnimatedTranscript';
 import { FloatingLocations } from './FloatingLocations';
@@ -20,6 +20,77 @@ export const VoiceAssistantLayout: React.FC<VoiceAssistantLayoutProps> = ({
   results = [],
   className = '',
 }) => {
+  const [voiceIntensity, setVoiceIntensity] = useState(0);
+  const [showResults, setShowResults] = useState(false);
+  const [visibleResultCount, setVisibleResultCount] = useState(0);
+  const prevStateRef = useRef<DemoState>(state);
+  const animationRef = useRef<number>(0);
+
+  // Simulate voice waveform when speaking or listening
+  useEffect(() => {
+    if (state === 'speaking' || state === 'listening') {
+      const interval = setInterval(() => {
+        // Create a pseudo-random waveform pattern
+        const baseWave = Math.sin(Date.now() * 0.008) * 0.3;
+        const quickWave = Math.sin(Date.now() * 0.02) * 0.2;
+        const noise = (Math.random() - 0.5) * 0.3;
+        setVoiceIntensity(Math.max(0, Math.min(1, 0.4 + baseWave + quickWave + noise)));
+      }, 50);
+
+      return () => clearInterval(interval);
+    } else {
+      // Smoothly fade out voice intensity
+      const fadeOut = () => {
+        setVoiceIntensity(prev => {
+          if (prev <= 0.01) return 0;
+          return prev * 0.9;
+        });
+        if (voiceIntensity > 0.01) {
+          animationRef.current = requestAnimationFrame(fadeOut);
+        }
+      };
+      fadeOut();
+      
+      return () => {
+        if (animationRef.current) {
+          cancelAnimationFrame(animationRef.current);
+        }
+      };
+    }
+  }, [state]);
+
+  // Handle results animation - staggered appearance
+  useEffect(() => {
+    if (state === 'results' && results.length > 0) {
+      // If coming from a non-results state, animate in
+      if (prevStateRef.current !== 'results') {
+        setShowResults(false);
+        setVisibleResultCount(0);
+        
+        // Start showing results after a brief delay
+        setTimeout(() => {
+          setShowResults(true);
+          
+          // Stagger each result
+          results.forEach((_, index) => {
+            setTimeout(() => {
+              setVisibleResultCount(prev => prev + 1);
+            }, index * 200);
+          });
+        }, 300);
+      } else {
+        // Already in results, just update (no animation)
+        setShowResults(true);
+        setVisibleResultCount(results.length);
+      }
+    } else {
+      setShowResults(false);
+      setVisibleResultCount(0);
+    }
+    
+    prevStateRef.current = state;
+  }, [state, results]);
+
   const getActivity = (): VoiceActivityLevel => {
     switch (state) {
       case 'idle':
@@ -37,14 +108,21 @@ export const VoiceAssistantLayout: React.FC<VoiceAssistantLayoutProps> = ({
     }
   };
 
+  // Determine if visualization should be in "compact" mode (when showing results)
+  const isCompact = state === 'results' && showResults;
+
   return (
-    <div className={`min-h-screen bg-background flex flex-col items-center justify-center px-6 pt-20 ${className}`}>
-      {/* Main visualization area */}
-      <div className="relative flex flex-col items-center justify-center flex-1 w-full max-w-4xl">
+    <div className={`min-h-screen bg-background flex flex-col items-center px-6 pt-16 ${className}`}>
+      {/* Main visualization area - moves up smoothly when results appear */}
+      <div 
+        className={`relative flex flex-col items-center w-full max-w-4xl transition-all duration-700 ease-out
+                   ${isCompact ? 'flex-none' : 'flex-1 justify-center'}`}
+      >
         
         {/* Status indicator */}
-        <div className="mb-8">
-          <span className="text-elegant text-muted-foreground animate-pulse-soft">
+        <div className="mb-6 transition-all duration-500">
+          <span className={`text-elegant text-muted-foreground transition-opacity duration-300
+                          ${state === 'searching' ? 'animate-pulse' : 'animate-pulse-soft'}`}>
             {state === 'idle' && 'Ready'}
             {state === 'listening' && 'Listening...'}
             {state === 'speaking' && 'Speaking'}
@@ -54,11 +132,14 @@ export const VoiceAssistantLayout: React.FC<VoiceAssistantLayoutProps> = ({
         </div>
 
         {/* Particle visualization with floating locations */}
-        <div className="relative">
+        <div 
+          className={`relative transition-all duration-700 ease-out
+                     ${isCompact ? 'scale-75 -mb-8' : 'scale-100'}`}
+        >
           <ParticleVisualization 
             activity={getActivity()} 
+            voiceIntensity={voiceIntensity}
             size={350}
-            className="animate-float"
           />
           
           {/* Floating locations during search */}
@@ -69,7 +150,10 @@ export const VoiceAssistantLayout: React.FC<VoiceAssistantLayoutProps> = ({
         </div>
 
         {/* Transcript area */}
-        <div className="mt-8 mb-12 max-w-2xl w-full min-h-[100px] flex items-center justify-center">
+        <div 
+          className={`max-w-2xl w-full min-h-[80px] flex items-center justify-center transition-all duration-500
+                     ${isCompact ? 'mt-0 mb-6' : 'mt-8 mb-12'}`}
+        >
           {transcript && (
             <AnimatedTranscript 
               text={transcript}
@@ -78,25 +162,33 @@ export const VoiceAssistantLayout: React.FC<VoiceAssistantLayoutProps> = ({
             />
           )}
         </div>
+      </div>
 
-        {/* Results grid */}
+      {/* Results grid - animates in from below */}
+      <div 
+        className={`w-full max-w-5xl px-4 pb-16 transition-all duration-700 ease-out
+                   ${showResults ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none'}`}
+      >
         {state === 'results' && results.length > 0 && (
-          <div className="w-full max-w-5xl px-4 pb-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {results.map((resort, index) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {results.slice(0, visibleResultCount).map((resort, index) => (
+              <div 
+                key={resort.id}
+                className="animate-fade-rise"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
                 <ResortCard 
-                  key={resort.id} 
                   resort={resort}
                   index={index}
                 />
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
 
       {/* Subtle branding */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2">
         <span className="text-elegant text-muted-foreground/40 tracking-[0.3em]">
           Voyage AI
         </span>

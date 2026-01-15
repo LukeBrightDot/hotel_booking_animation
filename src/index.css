@@ -52,10 +52,13 @@
     --font-serif: 'Cormorant Garamond', Georgia, serif;
     --font-sans: 'Inter', system-ui, sans-serif;
 
-    /* Particle colors */
-    --particle-primary: 15 55% 70%;
-    --particle-secondary: 35 45% 75%;
-    --particle-accent: 25 50% 72%;
+  /* Particle colors - multi-color palette */
+  --particle-gold: 42 65% 58%;
+  --particle-navy: 220 60% 35%;
+  --particle-royal-green: 160 45% 40%;
+  --particle-rose: 15 55% 70%;
+  --particle-champagne: 35 45% 75%;
+  --particle-coral: 25 50% 72%;
 
     /* Animation timing */
     --transition-slow: 800ms;
@@ -99,9 +102,12 @@
     --input: 30 10% 20%;
     --ring: 15 45% 60%;
 
-    --particle-primary: 15 50% 55%;
-    --particle-secondary: 35 40% 50%;
-    --particle-accent: 25 45% 52%;
+    --particle-gold: 42 60% 50%;
+    --particle-navy: 220 55% 30%;
+    --particle-royal-green: 160 40% 35%;
+    --particle-rose: 15 50% 55%;
+    --particle-champagne: 35 40% 50%;
+    --particle-coral: 25 45% 52%;
 
     --shadow-glow: 0 0 80px hsl(15 45% 50% / 0.2);
   }
