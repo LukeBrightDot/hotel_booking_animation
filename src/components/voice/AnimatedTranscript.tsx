@@ -44,18 +44,34 @@ export const AnimatedTranscript: React.FC<AnimatedTranscriptProps> = ({
   }, [text, isActive, words.length, speed]);
 
   return (
-    <div className={`text-luxury text-center ${className}`}>
-      <p className="text-2xl md:text-3xl leading-relaxed text-foreground/90">
+    <div 
+      className={className}
+      style={{ 
+        fontFamily: "'Cormorant Garamond', Georgia, serif",
+        fontWeight: 300,
+        letterSpacing: '0.025em',
+        textAlign: 'center'
+      }}
+    >
+      <p 
+        style={{ 
+          fontSize: 'clamp(1.5rem, 4vw, 1.875rem)',
+          lineHeight: 1.6,
+          color: 'hsl(30 20% 15% / 0.9)'
+        }}
+      >
         {words.map((word, index) => (
           <span
             key={`${word}-${index}`}
-            className={`inline-block mx-1 transition-all duration-500 ${
-              index < visibleWords
-                ? 'opacity-100 translate-y-0 blur-0'
-                : 'opacity-0 translate-y-2 blur-sm'
-            }`}
             style={{
+              display: 'inline-block',
+              marginLeft: '0.25rem',
+              marginRight: '0.25rem',
               transitionDelay: `${staggerDelay(index, 30)}ms`,
+              opacity: index < visibleWords ? 1 : 0,
+              transform: index < visibleWords ? 'translateY(0)' : 'translateY(0.5rem)',
+              filter: index < visibleWords ? 'blur(0)' : 'blur(4px)',
+              transition: 'all 500ms ease-out',
             }}
           >
             {word}
@@ -77,15 +93,29 @@ export const StaticTranscript: React.FC<StaticTranscriptProps> = ({
   className = '',
   variant = 'primary',
 }) => {
-  const variantStyles = {
-    primary: 'text-foreground/90',
-    secondary: 'text-foreground/70',
-    muted: 'text-muted-foreground',
+  const variantColors = {
+    primary: 'hsl(30 20% 15% / 0.9)',
+    secondary: 'hsl(30 20% 15% / 0.7)',
+    muted: 'hsl(30 15% 45%)',
   };
 
   return (
-    <div className={`text-luxury text-center ${className}`}>
-      <p className={`text-2xl md:text-3xl leading-relaxed ${variantStyles[variant]}`}>
+    <div 
+      className={className}
+      style={{ 
+        fontFamily: "'Cormorant Garamond', Georgia, serif",
+        fontWeight: 300,
+        letterSpacing: '0.025em',
+        textAlign: 'center'
+      }}
+    >
+      <p 
+        style={{ 
+          fontSize: 'clamp(1.5rem, 4vw, 1.875rem)',
+          lineHeight: 1.6,
+          color: variantColors[variant]
+        }}
+      >
         {text}
       </p>
     </div>
