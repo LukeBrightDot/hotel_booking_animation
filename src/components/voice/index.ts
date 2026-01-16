@@ -14,3 +14,4 @@ export { FloatingLocations } from './FloatingLocations';
 export { ResortCard, type Resort } from './ResortCard';
 export { VoiceAssistantLayout, type DemoState } from './VoiceAssistantLayout';
 export { StateToggle } from './StateToggle';
+export { SearchModeToggle, type SearchMode } from './SearchModeToggle';
