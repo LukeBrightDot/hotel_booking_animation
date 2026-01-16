@@ -4,6 +4,12 @@
 
 This guide provides step-by-step instructions to integrate a luxury hotel booking form UI into a Next.js application. The design uses a warm, elegant palette inspired by the "Her" movie aesthetic with inline styles for maximum portability.
 
+**Key Features:**
+- Voice/Search toggle that navigates between `/assistant` (voice) and current page (form)
+- Complete booking form with destination, dates, rooms, and guests
+- Warm luxury color palette with HSL colors
+- All inline styles for maximum portability (no Tailwind dependency)
+
 **Design System Colors (HSL format):**
 - Background: `hsl(30 25% 98%)` - Warm off-white
 - Primary/Accent: `hsl(15 55% 70%)` - Warm coral/terracotta
@@ -25,22 +31,40 @@ npx shadcn@latest add calendar popover
 
 ---
 
-## Phase 2: Create SearchModeToggle Component
+## Phase 2: Create SearchModeToggle Component (with Navigation)
 
 **File: `components/booking/SearchModeToggle.tsx`**
 
+This component navigates to `/assistant` when Voice is clicked, or stays on current page for Search.
+
 ```tsx
+'use client';
+
 import React from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { Mic, Search } from 'lucide-react';
 
 export type SearchMode = 'voice' | 'form';
 
 interface SearchModeToggleProps {
-  mode: SearchMode;
-  onModeChange: (mode: SearchMode) => void;
+  className?: string;
 }
 
-export const SearchModeToggle: React.FC<SearchModeToggleProps> = ({ mode, onModeChange }) => {
+export const SearchModeToggle: React.FC<SearchModeToggleProps> = ({ className = '' }) => {
+  const router = useRouter();
+  const pathname = usePathname();
+  
+  // Determine current mode based on pathname
+  const currentMode: SearchMode = pathname === '/assistant' ? 'voice' : 'form';
+
+  const handleModeChange = (mode: SearchMode) => {
+    if (mode === 'voice') {
+      router.push('/assistant');
+    } else {
+      router.push('/'); // or '/booking' depending on your route structure
+    }
+  };
+
   const buttonStyle = (isActive: boolean): React.CSSProperties => ({
     display: 'flex',
     alignItems: 'center',
@@ -60,25 +84,28 @@ export const SearchModeToggle: React.FC<SearchModeToggleProps> = ({ mode, onMode
   });
 
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: '4px',
-      padding: '4px',
-      background: 'hsl(30 20% 94%)',
-      borderRadius: '14px',
-      border: '1px solid hsl(30 15% 88%)',
-    }}>
+    <div 
+      className={className}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '4px',
+        padding: '4px',
+        background: 'hsl(30 20% 94%)',
+        borderRadius: '14px',
+        border: '1px solid hsl(30 15% 88%)',
+      }}
+    >
       <button
-        onClick={() => onModeChange('voice')}
-        style={buttonStyle(mode === 'voice')}
+        onClick={() => handleModeChange('voice')}
+        style={buttonStyle(currentMode === 'voice')}
       >
         <Mic style={{ width: '16px', height: '16px' }} />
         Voice
       </button>
       <button
-        onClick={() => onModeChange('form')}
-        style={buttonStyle(mode === 'form')}
+        onClick={() => handleModeChange('form')}
+        style={buttonStyle(currentMode === 'form')}
       >
         <Search style={{ width: '16px', height: '16px' }} />
         Search
@@ -92,7 +119,114 @@ export default SearchModeToggle;
 
 ---
 
-## Phase 3: Create BookingForm Component
+## Phase 3: Create Header Component
+
+**File: `components/booking/Header.tsx`**
+
+Reusable header with logo, navigation toggle, and auth buttons.
+
+```tsx
+'use client';
+
+import React from 'react';
+import { LogIn, UserPlus } from 'lucide-react';
+import { SearchModeToggle } from './SearchModeToggle';
+
+interface HeaderProps {
+  showModeToggle?: boolean;
+}
+
+export const Header: React.FC<HeaderProps> = ({ showModeToggle = true }) => {
+  return (
+    <header style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      zIndex: 50,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: '1rem 1.5rem',
+      background: 'hsl(30 25% 98% / 0.8)',
+      backdropFilter: 'blur(8px)',
+      WebkitBackdropFilter: 'blur(8px)',
+    }}>
+      {/* Logo */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <div style={{
+          width: '2rem',
+          height: '2rem',
+          borderRadius: '9999px',
+          background: 'linear-gradient(135deg, hsl(15 55% 70%), hsl(35 45% 75%))',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <span style={{ 
+            color: 'hsl(30 25% 98%)', 
+            fontWeight: 600, 
+            fontSize: '0.875rem' 
+          }}>V</span>
+        </div>
+        <span style={{ 
+          fontSize: '1.125rem', 
+          letterSpacing: '0.05em', 
+          color: 'hsl(30 20% 15%)',
+          fontFamily: '"Inter", system-ui, sans-serif',
+        }}>Voyage</span>
+      </div>
+
+      {/* Center: Search Mode Toggle */}
+      {showModeToggle && <SearchModeToggle />}
+
+      {/* Auth buttons */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <button style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          padding: '0.5rem 1rem',
+          fontSize: '0.875rem',
+          fontFamily: '"Inter", system-ui, sans-serif',
+          color: 'hsl(30 15% 45%)',
+          background: 'transparent',
+          border: 'none',
+          borderRadius: '0.5rem',
+          cursor: 'pointer',
+          transition: 'color 0.2s ease',
+        }}>
+          <LogIn style={{ width: '1rem', height: '1rem' }} />
+          Login
+        </button>
+        <button style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          padding: '0.5rem 1rem',
+          fontSize: '0.875rem',
+          fontFamily: '"Inter", system-ui, sans-serif',
+          color: 'hsl(30 25% 98%)',
+          background: 'hsl(15 55% 70%)',
+          border: 'none',
+          borderRadius: '0.5rem',
+          cursor: 'pointer',
+          transition: 'all 0.2s ease',
+        }}>
+          <UserPlus style={{ width: '1rem', height: '1rem' }} />
+          Join
+        </button>
+      </div>
+    </header>
+  );
+};
+
+export default Header;
+```
+
+---
+
+## Phase 4: Create BookingForm Component
 
 **File: `components/booking/BookingForm.tsx`**
 
@@ -141,6 +275,12 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
     });
   };
 
+  // Close dropdowns when clicking outside
+  const closeDropdowns = () => {
+    setShowRoomsDropdown(false);
+    setShowGuestsDropdown(false);
+  };
+
   const inputContainerStyle: React.CSSProperties = {
     background: 'hsl(30 20% 96%)',
     border: '1px solid hsl(30 15% 88%)',
@@ -182,11 +322,33 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
     flexShrink: 0,
   };
 
+  const dropdownStyle: React.CSSProperties = {
+    position: 'absolute',
+    top: 'calc(100% + 8px)',
+    left: 0,
+    right: 0,
+    background: 'hsl(30 25% 98%)',
+    border: '1px solid hsl(30 15% 88%)',
+    borderRadius: '10px',
+    padding: '6px',
+    zIndex: 50,
+    boxShadow: '0 4px 16px hsl(30 20% 15% / 0.1)',
+  };
+
+  const dropdownItemStyle = (isSelected: boolean): React.CSSProperties => ({
+    padding: '10px 14px',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontFamily: '"Inter", system-ui, sans-serif',
+    fontSize: '14px',
+    fontWeight: 400,
+    color: 'hsl(30 20% 15%)',
+    background: isSelected ? 'hsl(15 55% 70% / 0.15)' : 'transparent',
+    transition: 'background 0.2s ease',
+  });
+
   return (
-    <div className={className} style={{
-      width: '100%',
-      maxWidth: '800px',
-    }}>
+    <div className={className} style={{ width: '100%', maxWidth: '800px' }}>
       {/* Main Form Card */}
       <div style={{
         background: 'hsl(30 25% 98%)',
@@ -215,7 +377,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
           gap: '14px',
           marginBottom: '20px',
         }}>
-          {/* Destination Input */}
+          {/* Destination Input - spans 2 columns */}
           <div style={{ gridColumn: 'span 2' }}>
             <div 
               style={inputContainerStyle}
@@ -249,7 +411,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
             </div>
           </div>
 
-          {/* Check In */}
+          {/* Check In Date */}
           <Popover>
             <PopoverTrigger asChild>
               <div 
@@ -292,7 +454,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
             </PopoverContent>
           </Popover>
 
-          {/* Check Out */}
+          {/* Check Out Date */}
           <Popover>
             <PopoverTrigger asChild>
               <div 
@@ -335,7 +497,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
             </PopoverContent>
           </Popover>
 
-          {/* Rooms */}
+          {/* Rooms Dropdown */}
           <div style={{ position: 'relative' }}>
             <div 
               style={inputContainerStyle}
@@ -361,18 +523,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
             </div>
             
             {showRoomsDropdown && (
-              <div style={{
-                position: 'absolute',
-                top: 'calc(100% + 8px)',
-                left: 0,
-                right: 0,
-                background: 'hsl(30 25% 98%)',
-                border: '1px solid hsl(30 15% 88%)',
-                borderRadius: '10px',
-                padding: '6px',
-                zIndex: 50,
-                boxShadow: '0 4px 16px hsl(30 20% 15% / 0.1)',
-              }}>
+              <div style={dropdownStyle}>
                 {[1, 2, 3, 4, 5].map((num) => (
                   <div
                     key={num}
@@ -380,21 +531,16 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
                       setRooms(num);
                       setShowRoomsDropdown(false);
                     }}
-                    style={{
-                      padding: '10px 14px',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      ...valueStyle,
-                      background: rooms === num ? 'hsl(15 55% 70% / 0.15)' : 'transparent',
-                      transition: 'background 0.2s ease',
-                    }}
+                    style={dropdownItemStyle(rooms === num)}
                     onMouseEnter={(e) => {
                       if (rooms !== num) {
                         e.currentTarget.style.background = 'hsl(30 20% 94%)';
                       }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.background = rooms === num ? 'hsl(15 55% 70% / 0.15)' : 'transparent';
+                      e.currentTarget.style.background = rooms === num 
+                        ? 'hsl(15 55% 70% / 0.15)' 
+                        : 'transparent';
                     }}
                   >
                     {num} {num === 1 ? 'Room' : 'Rooms'}
@@ -404,7 +550,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
             )}
           </div>
 
-          {/* Guests */}
+          {/* Guests Dropdown */}
           <div style={{ position: 'relative' }}>
             <div 
               style={inputContainerStyle}
@@ -430,18 +576,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
             </div>
             
             {showGuestsDropdown && (
-              <div style={{
-                position: 'absolute',
-                top: 'calc(100% + 8px)',
-                left: 0,
-                right: 0,
-                background: 'hsl(30 25% 98%)',
-                border: '1px solid hsl(30 15% 88%)',
-                borderRadius: '10px',
-                padding: '6px',
-                zIndex: 50,
-                boxShadow: '0 4px 16px hsl(30 20% 15% / 0.1)',
-              }}>
+              <div style={dropdownStyle}>
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
                   <div
                     key={num}
@@ -449,21 +584,16 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
                       setGuests(num);
                       setShowGuestsDropdown(false);
                     }}
-                    style={{
-                      padding: '10px 14px',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      ...valueStyle,
-                      background: guests === num ? 'hsl(15 55% 70% / 0.15)' : 'transparent',
-                      transition: 'background 0.2s ease',
-                    }}
+                    style={dropdownItemStyle(guests === num)}
                     onMouseEnter={(e) => {
                       if (guests !== num) {
                         e.currentTarget.style.background = 'hsl(30 20% 94%)';
                       }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.background = guests === num ? 'hsl(15 55% 70% / 0.15)' : 'transparent';
+                      e.currentTarget.style.background = guests === num 
+                        ? 'hsl(15 55% 70% / 0.15)' 
+                        : 'transparent';
                     }}
                   >
                     {num} {num === 1 ? 'Guest' : 'Guests'}
@@ -522,7 +652,7 @@ export default BookingForm;
 
 ---
 
-## Phase 4: Create Exports
+## Phase 5: Create Exports
 
 **File: `components/booking/index.ts`**
 
@@ -530,127 +660,28 @@ export default BookingForm;
 export { BookingForm } from './BookingForm';
 export type { BookingData } from './BookingForm';
 export { SearchModeToggle, type SearchMode } from './SearchModeToggle';
+export { Header } from './Header';
 ```
 
 ---
 
-## Phase 5: Create Header Component
+## Phase 6: Create Booking Page
 
-**File: `components/booking/Header.tsx`**
+**File: `app/page.tsx` (or `app/booking/page.tsx`)**
+
+This is the main booking form page. When user clicks "Voice" in the toggle, it navigates to `/assistant`.
 
 ```tsx
 'use client';
 
 import React from 'react';
-import { LogIn, UserPlus } from 'lucide-react';
-import { SearchModeToggle, type SearchMode } from './SearchModeToggle';
+import { BookingForm, type BookingData, Header } from '@/components/booking';
 
-interface HeaderProps {
-  searchMode: SearchMode;
-  onModeChange: (mode: SearchMode) => void;
-  showModeToggle?: boolean;
-}
-
-export const Header: React.FC<HeaderProps> = ({ 
-  searchMode, 
-  onModeChange, 
-  showModeToggle = true 
-}) => {
-  return (
-    <header style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      zIndex: 50,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: '1rem 1.5rem',
-      background: 'hsl(30 25% 98% / 0.8)',
-      backdropFilter: 'blur(8px)',
-      WebkitBackdropFilter: 'blur(8px)',
-    }}>
-      {/* Logo */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <div style={{
-          width: '2rem',
-          height: '2rem',
-          borderRadius: '9999px',
-          background: 'linear-gradient(135deg, hsl(15 55% 70%), hsl(35 45% 75%))',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-          <span style={{ color: 'hsl(30 25% 98%)', fontWeight: 600, fontSize: '0.875rem' }}>V</span>
-        </div>
-        <span style={{ fontSize: '1.125rem', letterSpacing: '0.05em', color: 'hsl(30 20% 15%)' }}>Voyage</span>
-      </div>
-
-      {/* Center: Search Mode Toggle */}
-      {showModeToggle && (
-        <SearchModeToggle mode={searchMode} onModeChange={onModeChange} />
-      )}
-
-      {/* Auth buttons */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <button style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          padding: '0.5rem 1rem',
-          fontSize: '0.875rem',
-          color: 'hsl(30 15% 45%)',
-          background: 'transparent',
-          border: 'none',
-          borderRadius: '0.5rem',
-          cursor: 'pointer',
-        }}>
-          <LogIn style={{ width: '1rem', height: '1rem' }} />
-          Login
-        </button>
-        <button style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          padding: '0.5rem 1rem',
-          fontSize: '0.875rem',
-          color: 'hsl(30 25% 98%)',
-          background: 'hsl(15 55% 70%)',
-          border: 'none',
-          borderRadius: '0.5rem',
-          cursor: 'pointer',
-        }}>
-          <UserPlus style={{ width: '1rem', height: '1rem' }} />
-          Join
-        </button>
-      </div>
-    </header>
-  );
-};
-
-export default Header;
-```
-
----
-
-## Phase 6: Create Main Page Layout
-
-**File: `app/page.tsx` (or `pages/index.tsx` for Pages Router)**
-
-```tsx
-'use client';
-
-import React, { useState } from 'react';
-import { BookingForm, type BookingData, type SearchMode } from '@/components/booking';
-import { Header } from '@/components/booking/Header';
-
-export default function HomePage() {
-  const [searchMode, setSearchMode] = useState<SearchMode>('form');
-
+export default function BookingPage() {
   const handleFormSearch = (data: BookingData) => {
     console.log('Search data:', data);
-    // Handle search - navigate to results, call API, etc.
+    // Navigate to results page or call search API
+    // router.push(`/results?destination=${data.destination}&...`);
   };
 
   return (
@@ -662,12 +693,8 @@ export default function HomePage() {
       alignItems: 'center',
       padding: '5rem 1.5rem 0',
     }}>
-      {/* Header */}
-      <Header 
-        searchMode={searchMode} 
-        onModeChange={setSearchMode}
-        showModeToggle={true}
-      />
+      {/* Header with Voice/Search toggle */}
+      <Header showModeToggle={true} />
 
       {/* Main content area */}
       <main style={{
@@ -708,11 +735,39 @@ export default function HomePage() {
 
 ---
 
-## Phase 7: Calendar Component Styling (Critical)
+## Phase 7: Update Assistant Page Header
 
-The shadcn Calendar component needs custom styling to match the warm theme. Update your calendar styles:
+On your existing `/assistant` page, add the same Header component so the Voice/Search toggle appears there too:
 
-**Add to `globals.css` or component styles:**
+**Update: `app/assistant/page.tsx`**
+
+```tsx
+// At the top of your existing assistant page, add:
+import { Header } from '@/components/booking';
+
+// Then in your component's return, add the Header:
+export default function AssistantPage() {
+  return (
+    <div style={{
+      minHeight: '100vh',
+      background: 'hsl(30 25% 98%)',
+      // ... your existing styles
+    }}>
+      {/* Add this Header - Voice will be highlighted since we're on /assistant */}
+      <Header showModeToggle={true} />
+      
+      {/* Rest of your existing assistant UI */}
+      {/* ... */}
+    </div>
+  );
+}
+```
+
+---
+
+## Phase 8: Calendar Styling (Critical)
+
+Add these styles to your `globals.css` for consistent calendar theming:
 
 ```css
 /* Calendar warm theme overrides */
@@ -735,68 +790,68 @@ The shadcn Calendar component needs custom styling to match the warm theme. Upda
 .rdp-day_today:not(.rdp-day_selected) {
   border: 1px solid hsl(15 55% 70%);
 }
+
+/* Ensure calendar text uses the warm palette */
+.rdp-caption_label {
+  color: hsl(30 20% 15%);
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+.rdp-head_cell {
+  color: hsl(30 15% 45%);
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.rdp-day {
+  color: hsl(30 20% 25%);
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+.rdp-day_disabled {
+  color: hsl(30 15% 75%);
+}
 ```
 
 ---
 
 ## Verification Checklist
 
-After implementation, verify:
+### Header Component
+- [ ] Logo displays with gradient background (coral to sand)
+- [ ] "Voyage" text next to logo
+- [ ] Voice/Search toggle centered in header
+- [ ] Toggle correctly highlights based on current route (`/assistant` = Voice, else = Search)
+- [ ] Clicking Voice navigates to `/assistant`
+- [ ] Clicking Search navigates to `/` (or your booking route)
+- [ ] Login button (transparent background)
+- [ ] Join button (coral background)
+- [ ] Header has blur backdrop effect
 
-1. **Header renders correctly:**
-   - Logo with gradient background
-   - Voice/Search toggle (if enabled)
-   - Login/Join buttons
+### Booking Form
+- [ ] Card has warm off-white background with subtle border
+- [ ] "Find Your Perfect Stay" title centered
+- [ ] Destination input spans 2 columns
+- [ ] All inputs have coral icons
+- [ ] Hover effect on inputs (coral border + subtle glow)
+- [ ] Check In calendar opens and disables past dates
+- [ ] Check Out calendar opens and disables dates before Check In
+- [ ] Rooms dropdown shows 1-5 options
+- [ ] Guests dropdown shows 1-8 options
+- [ ] Dropdowns close on selection
+- [ ] Selected dropdown item highlighted with coral tint
+- [ ] Search button has coral gradient
+- [ ] Search button lifts on hover
 
-2. **Form card displays:**
-   - Rounded corners (20px)
-   - Subtle shadow
-   - Warm off-white background
-
-3. **Input fields work:**
-   - Destination text input
-   - Check In date picker opens calendar
-   - Check Out date picker (disabled dates before Check In)
-   - Rooms dropdown (1-5)
-   - Guests dropdown (1-8)
-
-4. **Hover effects:**
-   - Inputs get coral border on hover
-   - Subtle glow shadow on hover
-   - Search button lifts on hover
-
-5. **Search button:**
-   - Coral gradient background
-   - White text and icon
-   - Hover lift animation
-
-6. **Dropdowns:**
-   - Proper z-index (appear above other elements)
-   - Selected item highlighted
-   - Close on selection
-
----
-
-## Common Issues & Solutions
-
-### Issue: Calendar not appearing in popover
-**Solution:** Add `pointer-events-auto` to Calendar className:
-```tsx
-<CalendarComponent className="p-3 pointer-events-auto" />
-```
-
-### Issue: Dropdowns appearing behind other elements
-**Solution:** Ensure dropdown container has `zIndex: 50`
-
-### Issue: Fonts not loading
-**Solution:** Add Inter font to your `layout.tsx`:
-```tsx
-import { Inter } from 'next/font/google';
-const inter = Inter({ subsets: ['latin'] });
-```
-
-### Issue: Hover styles not working in Next.js
-**Solution:** The inline `onMouseEnter`/`onMouseLeave` handlers should work. If not, use CSS modules or styled-components.
+### Colors Used (verify consistency)
+- [ ] `hsl(30 25% 98%)` - Page background, form card
+- [ ] `hsl(15 55% 70%)` - Primary accent (icons, button, hover borders)
+- [ ] `hsl(35 45% 75%)` - Secondary (logo gradient)
+- [ ] `hsl(30 20% 15%)` - Primary text
+- [ ] `hsl(30 15% 45%)` - Secondary text (labels)
+- [ ] `hsl(30 15% 88%)` - Borders
+- [ ] `hsl(30 20% 96%)` - Input backgrounds
 
 ---
 
@@ -805,20 +860,69 @@ const inter = Inter({ subsets: ['latin'] });
 ```
 components/
   booking/
-    BookingForm.tsx      # Main form component
-    SearchModeToggle.tsx # Voice/Search toggle
-    Header.tsx           # Page header
-    index.ts             # Exports
+    BookingForm.tsx       # Main form component
+    SearchModeToggle.tsx  # Voice/Search toggle with navigation
+    Header.tsx            # Shared header component
+    index.ts              # Exports
 app/
-  page.tsx               # Main page using components
+  page.tsx                # Booking form page (Search mode)
+  assistant/
+    page.tsx              # Voice assistant page (Voice mode)
+```
+
+---
+
+## Common Issues & Solutions
+
+### Issue: Calendar not clickable in popover
+**Solution:** Add `pointer-events-auto` to Calendar className:
+```tsx
+<CalendarComponent className="p-3 pointer-events-auto" />
+```
+
+### Issue: Dropdowns appearing behind other elements
+**Solution:** Ensure dropdown has `zIndex: 50` in styles
+
+### Issue: Navigation not working
+**Solution:** Ensure you're using Next.js App Router (`next/navigation`) not Pages Router (`next/router`)
+
+### Issue: Fonts not loading
+**Solution:** Add Inter font in `layout.tsx`:
+```tsx
+import { Inter } from 'next/font/google';
+const inter = Inter({ subsets: ['latin'] });
+// Apply to body: <body className={inter.className}>
+```
+
+### Issue: Backdrop blur not working
+**Solution:** Both `backdropFilter` and `WebkitBackdropFilter` are included for cross-browser support
+
+### Issue: Hover effects feel wrong
+**Solution:** Verify transition timing is `0.3s ease` and colors match the palette
+
+---
+
+## Integration with Existing Voice Assistant
+
+If your `/assistant` page already has a header, you have two options:
+
+**Option A:** Replace your existing header with the shared `Header` component
+
+**Option B:** Just add the `SearchModeToggle` component to your existing header:
+```tsx
+import { SearchModeToggle } from '@/components/booking';
+
+// In your existing header JSX:
+<SearchModeToggle />
 ```
 
 ---
 
 ## Notes
 
-- All styles use inline React.CSSProperties for maximum portability
-- HSL colors are used consistently for the warm palette
-- The design matches the voice assistant UI for seamless integration
+- All styles use inline `React.CSSProperties` for maximum portability
+- No Tailwind CSS dependency (works in any React/Next.js project)
+- HSL colors used consistently throughout
+- The toggle auto-detects current page via `usePathname()`
+- Hover effects use JavaScript event handlers
 - Calendar requires shadcn/ui Popover and Calendar components
-- All hover effects use JavaScript event handlers (no CSS required)
