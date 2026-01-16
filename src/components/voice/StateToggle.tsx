@@ -21,17 +21,47 @@ export const StateToggle: React.FC<StateToggleProps> = ({
   className = '',
 }) => {
   return (
-    <div className={`fixed top-20 left-1/2 -translate-x-1/2 z-40 ${className}`}>
-      <div className="flex items-center gap-1 p-1.5 bg-card/80 backdrop-blur-xl rounded-full border border-border/50 shadow-soft">
+    <div 
+      className={className}
+      style={{
+        position: 'fixed',
+        top: '5rem',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 40,
+      }}
+    >
+      <div 
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.25rem',
+          padding: '0.375rem',
+          background: 'hsl(30 20% 96% / 0.8)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
+          borderRadius: '9999px',
+          border: '1px solid hsl(30 15% 88% / 0.5)',
+          boxShadow: '0 4px 20px hsl(30 20% 15% / 0.05)',
+        }}
+      >
         {STATES.map(({ value, label }) => (
           <button
             key={value}
             onClick={() => onStateChange(value)}
-            className={`px-4 py-2 rounded-full text-xs font-light tracking-wide transition-all duration-300
-              ${currentState === value 
-                ? 'bg-primary text-primary-foreground shadow-sm' 
-                : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
-              }`}
+            style={{
+              padding: '0.5rem 1rem',
+              borderRadius: '9999px',
+              fontSize: '0.75rem',
+              fontWeight: 300,
+              letterSpacing: '0.05em',
+              transition: 'all 300ms',
+              border: 'none',
+              cursor: 'pointer',
+              background: currentState === value ? 'hsl(15 55% 70%)' : 'transparent',
+              color: currentState === value ? 'hsl(30 25% 98%)' : 'hsl(30 15% 45%)',
+              boxShadow: currentState === value ? '0 2px 8px hsl(15 55% 70% / 0.3)' : 'none',
+            }}
           >
             {label}
           </button>

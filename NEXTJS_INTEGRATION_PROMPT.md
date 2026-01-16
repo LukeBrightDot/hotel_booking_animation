@@ -616,18 +616,34 @@ export const AnimatedTranscript: React.FC<AnimatedTranscriptProps> = ({
   }, [text, isActive, words.length, speed]);
 
   return (
-    <div className={`text-luxury text-center ${className}`}>
-      <p className="text-2xl md:text-3xl leading-relaxed text-foreground/90">
+    <div 
+      className={className}
+      style={{ 
+        fontFamily: "'Cormorant Garamond', Georgia, serif",
+        fontWeight: 300,
+        letterSpacing: '0.025em',
+        textAlign: 'center'
+      }}
+    >
+      <p 
+        style={{ 
+          fontSize: 'clamp(1.5rem, 4vw, 1.875rem)',
+          lineHeight: 1.6,
+          color: 'hsl(30 20% 15% / 0.9)'
+        }}
+      >
         {words.map((word, index) => (
           <span
             key={`${word}-${index}`}
-            className={`inline-block mx-1 transition-all duration-500 ${
-              index < visibleWords
-                ? 'opacity-100 translate-y-0 blur-0'
-                : 'opacity-0 translate-y-2 blur-sm'
-            }`}
             style={{
+              display: 'inline-block',
+              marginLeft: '0.25rem',
+              marginRight: '0.25rem',
               transitionDelay: `${staggerDelay(index, 30)}ms`,
+              opacity: index < visibleWords ? 1 : 0,
+              transform: index < visibleWords ? 'translateY(0)' : 'translateY(0.5rem)',
+              filter: index < visibleWords ? 'blur(0)' : 'blur(4px)',
+              transition: 'all 500ms ease-out',
             }}
           >
             {word}
@@ -649,15 +665,29 @@ export const StaticTranscript: React.FC<StaticTranscriptProps> = ({
   className = '',
   variant = 'primary',
 }) => {
-  const variantStyles = {
-    primary: 'text-foreground/90',
-    secondary: 'text-foreground/70',
-    muted: 'text-muted-foreground',
+  const variantColors = {
+    primary: 'hsl(30 20% 15% / 0.9)',
+    secondary: 'hsl(30 20% 15% / 0.7)',
+    muted: 'hsl(30 15% 45%)',
   };
 
   return (
-    <div className={`text-luxury text-center ${className}`}>
-      <p className={`text-2xl md:text-3xl leading-relaxed ${variantStyles[variant]}`}>
+    <div 
+      className={className}
+      style={{ 
+        fontFamily: "'Cormorant Garamond', Georgia, serif",
+        fontWeight: 300,
+        letterSpacing: '0.025em',
+        textAlign: 'center'
+      }}
+    >
+      <p 
+        style={{ 
+          fontSize: 'clamp(1.5rem, 4vw, 1.875rem)',
+          lineHeight: 1.6,
+          color: variantColors[variant]
+        }}
+      >
         {text}
       </p>
     </div>
@@ -857,58 +887,153 @@ export const ResortCard: React.FC<ResortCardProps> = ({
 }) => {
   return (
     <div
-      className={`group bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-6 
-                  hover:bg-card/80 hover:border-primary/20 hover:shadow-glow
-                  transition-all duration-500 cursor-pointer animate-card-entrance ${className}`}
+      className={`group rounded-xl transition-all duration-500 cursor-pointer ${className}`}
       style={{
+        background: 'hsl(30 20% 96% / 0.5)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        border: '1px solid hsl(30 15% 88% / 0.5)',
+        padding: '1.5rem',
         animationDelay: `${index * 150}ms`,
+        animation: 'cardEntrance 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = 'hsl(30 20% 96% / 0.8)';
+        e.currentTarget.style.borderColor = 'hsl(15 55% 70% / 0.3)';
+        e.currentTarget.style.boxShadow = '0 0 60px hsl(15 55% 70% / 0.15)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = 'hsl(30 20% 96% / 0.5)';
+        e.currentTarget.style.borderColor = 'hsl(30 15% 88% / 0.5)';
+        e.currentTarget.style.boxShadow = 'none';
       }}
     >
       {resort.imageUrl && (
-        <div className="relative h-48 mb-5 rounded-lg overflow-hidden bg-muted">
+        <div 
+          className="relative overflow-hidden"
+          style={{ 
+            height: '12rem', 
+            marginBottom: '1.25rem', 
+            borderRadius: '0.5rem',
+            background: 'hsl(30 15% 92%)' 
+          }}
+        >
           <img 
             src={resort.imageUrl} 
             alt={resort.name}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
+          <div 
+            className="absolute inset-0" 
+            style={{ background: 'linear-gradient(to top, hsl(30 20% 6% / 0.6), transparent)' }} 
+          />
         </div>
       )}
 
-      <div className="space-y-3">
-        <span className="text-elegant text-muted-foreground">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        <span 
+          style={{ 
+            fontFamily: "'Inter', system-ui, sans-serif",
+            fontWeight: 200,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            fontSize: '0.75rem',
+            color: 'hsl(30 15% 45%)'
+          }}
+        >
           {resort.location}
         </span>
 
-        <h3 className="font-serif text-xl font-light text-foreground group-hover:text-primary transition-colors">
+        <h3 
+          className="group-hover:text-primary transition-colors"
+          style={{ 
+            fontFamily: "'Cormorant Garamond', Georgia, serif",
+            fontSize: '1.25rem',
+            fontWeight: 300,
+            color: 'hsl(30 20% 15%)'
+          }}
+        >
           {resort.name}
         </h3>
 
-        <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
+        <p 
+          style={{ 
+            fontSize: '0.875rem',
+            color: 'hsl(30 15% 45%)',
+            lineHeight: 1.6,
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden'
+          }}
+        >
           {resort.description}
         </p>
 
-        <div className="flex flex-wrap gap-2 pt-2">
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', paddingTop: '0.5rem' }}>
           {resort.amenities.slice(0, 3).map((amenity, i) => (
             <span 
               key={i}
-              className="text-xs px-2.5 py-1 rounded-full bg-secondary/50 text-secondary-foreground"
+              style={{
+                fontSize: '0.75rem',
+                padding: '0.25rem 0.625rem',
+                borderRadius: '9999px',
+                background: 'hsl(30 20% 92% / 0.5)',
+                color: 'hsl(30 20% 25%)'
+              }}
             >
               {amenity}
             </span>
           ))}
         </div>
 
-        <div className="flex items-end justify-between pt-4 border-t border-border/30">
+        <div 
+          style={{ 
+            display: 'flex', 
+            alignItems: 'flex-end', 
+            justifyContent: 'space-between', 
+            paddingTop: '1rem',
+            borderTop: '1px solid hsl(30 15% 88% / 0.3)'
+          }}
+        >
           <div>
-            <span className="text-elegant text-muted-foreground block mb-1">From</span>
-            <span className="font-serif text-lg text-foreground">{resort.pricePerNight}</span>
-            <span className="text-xs text-muted-foreground"> / night</span>
+            <span 
+              style={{ 
+                fontFamily: "'Inter', system-ui, sans-serif",
+                fontWeight: 200,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                fontSize: '0.75rem',
+                color: 'hsl(30 15% 45%)',
+                display: 'block',
+                marginBottom: '0.25rem'
+              }}
+            >
+              From
+            </span>
+            <span 
+              style={{ 
+                fontFamily: "'Cormorant Garamond', Georgia, serif",
+                fontSize: '1.125rem',
+                color: 'hsl(30 20% 15%)'
+              }}
+            >
+              {resort.pricePerNight}
+            </span>
+            <span style={{ fontSize: '0.75rem', color: 'hsl(30 15% 45%)' }}> / night</span>
           </div>
           
-          <div className="flex items-center gap-1.5">
-            <span className="text-gold">★</span>
-            <span className="text-sm font-light text-foreground">{resort.rating.toFixed(1)}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+            <span style={{ color: 'hsl(42 65% 50%)' }}>★</span>
+            <span 
+              style={{ 
+                fontSize: '0.875rem', 
+                fontWeight: 300, 
+                color: 'hsl(30 20% 15%)' 
+              }}
+            >
+              {resort.rating.toFixed(1)}
+            </span>
           </div>
         </div>
       </div>
@@ -950,17 +1075,47 @@ export const StateToggle: React.FC<StateToggleProps> = ({
   className = '',
 }) => {
   return (
-    <div className={`fixed top-20 left-1/2 -translate-x-1/2 z-40 ${className}`}>
-      <div className="flex items-center gap-1 p-1.5 bg-card/80 backdrop-blur-xl rounded-full border border-border/50 shadow-soft">
+    <div 
+      className={className}
+      style={{
+        position: 'fixed',
+        top: '5rem',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 40,
+      }}
+    >
+      <div 
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.25rem',
+          padding: '0.375rem',
+          background: 'hsl(30 20% 96% / 0.8)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
+          borderRadius: '9999px',
+          border: '1px solid hsl(30 15% 88% / 0.5)',
+          boxShadow: '0 4px 20px hsl(30 20% 15% / 0.05)',
+        }}
+      >
         {STATES.map(({ value, label }) => (
           <button
             key={value}
             onClick={() => onStateChange(value)}
-            className={`px-4 py-2 rounded-full text-xs font-light tracking-wide transition-all duration-300
-              ${currentState === value 
-                ? 'bg-primary text-primary-foreground shadow-sm' 
-                : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
-              }`}
+            style={{
+              padding: '0.5rem 1rem',
+              borderRadius: '9999px',
+              fontSize: '0.75rem',
+              fontWeight: 300,
+              letterSpacing: '0.05em',
+              transition: 'all 300ms',
+              border: 'none',
+              cursor: 'pointer',
+              background: currentState === value ? 'hsl(15 55% 70%)' : 'transparent',
+              color: currentState === value ? 'hsl(30 25% 98%)' : 'hsl(30 15% 45%)',
+              boxShadow: currentState === value ? '0 2px 8px hsl(15 55% 70% / 0.3)' : 'none',
+            }}
           >
             {label}
           </button>
