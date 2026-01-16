@@ -2,9 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { 
   VoiceAssistantLayout, 
   StateToggle,
+  SearchModeToggle,
   type DemoState,
+  type SearchMode,
   type Resort 
 } from '@/components/voice';
+import { BookingForm, type BookingData } from '@/components/booking';
+import { Mic, MicOff, Volume2, VolumeX, LogIn, UserPlus } from 'lucide-react';
+import { ParticleVisualization } from '@/components/voice/ParticleVisualization';
+import { FloatingLocations } from '@/components/voice/FloatingLocations';
+import { AnimatedTranscript } from '@/components/voice/AnimatedTranscript';
+import { ResortCard } from '@/components/voice/ResortCard';
+import { type VoiceActivityLevel } from '@/lib/animations';
 
 // Demo transcripts for each state
 const DEMO_TRANSCRIPTS: Record<DemoState, string> = {
@@ -50,8 +59,14 @@ const SAMPLE_RESORTS: Resort[] = [
 ];
 
 const Index: React.FC = () => {
+  const [searchMode, setSearchMode] = useState<SearchMode>('voice');
   const [demoState, setDemoState] = useState<DemoState>('idle');
   const [transcript, setTranscript] = useState('');
+  const [isMicMuted, setIsMicMuted] = useState(false);
+  const [isSpeakerMuted, setIsSpeakerMuted] = useState(false);
+  const [voiceIntensity, setVoiceIntensity] = useState(0);
+  const [showResults, setShowResults] = useState(false);
+  const [visibleResultCount, setVisibleResultCount] = useState(0);
 
   // Update transcript when state changes
   useEffect(() => {
@@ -61,21 +76,317 @@ const Index: React.FC = () => {
     }
   }, [demoState]);
 
-  return (
-    <>
-      {/* State toggle for demo purposes */}
-      <StateToggle 
-        currentState={demoState}
-        onStateChange={setDemoState}
-      />
+  // Simulate voice waveform when speaking or listening
+  useEffect(() => {
+    if (demoState === 'speaking' || demoState === 'listening') {
+      const interval = setInterval(() => {
+        const baseWave = Math.sin(Date.now() * 0.008) * 0.3;
+        const quickWave = Math.sin(Date.now() * 0.02) * 0.2;
+        const noise = (Math.random() - 0.5) * 0.3;
+        setVoiceIntensity(Math.max(0, Math.min(1, 0.4 + baseWave + quickWave + noise)));
+      }, 50);
+      return () => clearInterval(interval);
+    } else {
+      setVoiceIntensity(0);
+    }
+  }, [demoState]);
 
-      {/* Main voice assistant layout */}
-      <VoiceAssistantLayout
-        state={demoState}
-        transcript={transcript}
-        results={demoState === 'results' ? SAMPLE_RESORTS : []}
-      />
-    </>
+  // Handle results animation
+  useEffect(() => {
+    if (demoState === 'results' && SAMPLE_RESORTS.length > 0) {
+      setShowResults(false);
+      setVisibleResultCount(0);
+      setTimeout(() => {
+        setShowResults(true);
+        SAMPLE_RESORTS.forEach((_, index) => {
+          setTimeout(() => {
+            setVisibleResultCount(prev => prev + 1);
+          }, index * 200);
+        });
+      }, 300);
+    } else {
+      setShowResults(false);
+      setVisibleResultCount(0);
+    }
+  }, [demoState]);
+
+  const getActivity = (): VoiceActivityLevel => {
+    switch (demoState) {
+      case 'idle': return 'idle';
+      case 'listening': return 'listening';
+      case 'speaking': return 'speaking';
+      case 'searching': return 'processing';
+      case 'results': return 'idle';
+      default: return 'idle';
+    }
+  };
+
+  const handleFormSearch = (data: BookingData) => {
+    console.log('Form search:', data);
+    // Could trigger results view here
+  };
+
+  const isCompact = demoState === 'results' && showResults;
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      background: 'hsl(30 25% 98%)',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      padding: '5rem 1.5rem 0',
+    }}>
+      {/* Header */}
+      <header style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 50,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '1rem 1.5rem',
+        background: 'hsl(30 25% 98% / 0.8)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+      }}>
+        {/* Logo */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div style={{
+            width: '2rem',
+            height: '2rem',
+            borderRadius: '9999px',
+            background: 'linear-gradient(135deg, hsl(15 55% 70%), hsl(35 45% 75%))',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            <span style={{ color: 'hsl(30 25% 98%)', fontWeight: 600, fontSize: '0.875rem' }}>V</span>
+          </div>
+          <span style={{ fontSize: '1.125rem', letterSpacing: '0.05em', color: 'hsl(30 20% 15%)' }}>Voyage</span>
+        </div>
+
+        {/* Center: Search Mode Toggle */}
+        <SearchModeToggle mode={searchMode} onModeChange={setSearchMode} />
+
+        {/* Auth buttons */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <button style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            padding: '0.5rem 1rem',
+            fontSize: '0.875rem',
+            color: 'hsl(30 15% 45%)',
+            background: 'transparent',
+            border: 'none',
+            borderRadius: '0.5rem',
+            cursor: 'pointer',
+          }}>
+            <LogIn style={{ width: '1rem', height: '1rem' }} />
+            Login
+          </button>
+          <button style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            padding: '0.5rem 1rem',
+            fontSize: '0.875rem',
+            color: 'hsl(30 25% 98%)',
+            background: 'hsl(15 55% 70%)',
+            border: 'none',
+            borderRadius: '0.5rem',
+            cursor: 'pointer',
+          }}>
+            <UserPlus style={{ width: '1rem', height: '1rem' }} />
+            Join
+          </button>
+        </div>
+      </header>
+
+      {/* Audio controls - fixed bottom right (only show in voice mode) */}
+      {searchMode === 'voice' && (
+        <div style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem', zIndex: 50, display: 'flex', gap: '0.75rem' }}>
+          <button
+            onClick={() => setIsMicMuted(!isMicMuted)}
+            style={{
+              width: '3rem',
+              height: '3rem',
+              borderRadius: '9999px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 300ms',
+              boxShadow: '0 4px 12px hsl(30 20% 15% / 0.1)',
+              border: isMicMuted ? '1px solid hsl(0 70% 50% / 0.3)' : '1px solid hsl(30 15% 88%)',
+              background: isMicMuted ? 'hsl(0 70% 50% / 0.2)' : 'hsl(30 20% 96%)',
+              color: isMicMuted ? 'hsl(0 70% 50%)' : 'hsl(15 55% 70%)',
+              cursor: 'pointer',
+            }}
+          >
+            {isMicMuted ? <MicOff style={{ width: '1.25rem', height: '1.25rem' }} /> : <Mic style={{ width: '1.25rem', height: '1.25rem' }} />}
+          </button>
+          <button
+            onClick={() => setIsSpeakerMuted(!isSpeakerMuted)}
+            style={{
+              width: '3rem',
+              height: '3rem',
+              borderRadius: '9999px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 300ms',
+              boxShadow: '0 4px 12px hsl(30 20% 15% / 0.1)',
+              border: isSpeakerMuted ? '1px solid hsl(0 70% 50% / 0.3)' : '1px solid hsl(30 15% 88%)',
+              background: isSpeakerMuted ? 'hsl(0 70% 50% / 0.2)' : 'hsl(30 20% 96%)',
+              color: isSpeakerMuted ? 'hsl(0 70% 50%)' : 'hsl(15 55% 70%)',
+              cursor: 'pointer',
+            }}
+          >
+            {isSpeakerMuted ? <VolumeX style={{ width: '1.25rem', height: '1.25rem' }} /> : <Volume2 style={{ width: '1.25rem', height: '1.25rem' }} />}
+          </button>
+        </div>
+      )}
+
+      {/* State toggle for demo (only in voice mode) */}
+      {searchMode === 'voice' && (
+        <StateToggle 
+          currentState={demoState}
+          onStateChange={setDemoState}
+        />
+      )}
+
+      {/* Main content area */}
+      <main style={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: searchMode === 'form' ? 'center' : (isCompact ? 'flex-start' : 'center'),
+        width: '100%',
+        maxWidth: '56rem',
+        transition: 'all 500ms ease-out',
+      }}>
+        {searchMode === 'voice' ? (
+          <>
+            {/* Status indicator */}
+            <div style={{ marginBottom: '1.5rem', transition: 'all 500ms' }}>
+              <span style={{
+                fontFamily: "'Inter', system-ui, sans-serif",
+                fontWeight: 200,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                fontSize: '0.75rem',
+                color: 'hsl(30 15% 45%)',
+              }}>
+                {demoState === 'idle' && 'Ready'}
+                {demoState === 'listening' && 'Listening...'}
+                {demoState === 'speaking' && 'Speaking'}
+                {demoState === 'searching' && 'Searching'}
+                {demoState === 'results' && 'Found for you'}
+              </span>
+            </div>
+
+            {/* Particle visualization */}
+            <div style={{
+              position: 'relative',
+              transition: 'all 700ms ease-out',
+              transform: isCompact ? 'scale(0.75)' : 'scale(1)',
+              marginBottom: isCompact ? '-2rem' : 0,
+            }}>
+              <ParticleVisualization 
+                activity={getActivity()} 
+                voiceIntensity={voiceIntensity}
+                size={350}
+              />
+              <FloatingLocations 
+                isActive={demoState === 'searching'}
+                radius={220}
+              />
+            </div>
+
+            {/* Transcript area */}
+            <div style={{
+              maxWidth: '42rem',
+              width: '100%',
+              minHeight: '80px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 500ms',
+              marginTop: isCompact ? 0 : '2rem',
+              marginBottom: isCompact ? '1.5rem' : '3rem',
+            }}>
+              {transcript && (
+                <AnimatedTranscript 
+                  text={transcript}
+                  isActive={demoState === 'speaking'}
+                  speed="medium"
+                />
+              )}
+            </div>
+          </>
+        ) : (
+          /* Booking Form */
+          <BookingForm onSearch={handleFormSearch} />
+        )}
+      </main>
+
+      {/* Results grid (voice mode only) */}
+      {searchMode === 'voice' && (
+        <div style={{
+          width: '100%',
+          maxWidth: '72rem',
+          padding: '0 1rem 4rem',
+          transition: 'all 700ms ease-out',
+          opacity: showResults ? 1 : 0,
+          transform: showResults ? 'translateY(0)' : 'translateY(2rem)',
+          pointerEvents: showResults ? 'auto' : 'none',
+        }}>
+          {demoState === 'results' && SAMPLE_RESORTS.length > 0 && (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+              gap: '1.5rem',
+            }}>
+              {SAMPLE_RESORTS.slice(0, visibleResultCount).map((resort, index) => (
+                <div 
+                  key={resort.id}
+                  style={{ 
+                    animation: 'fadeRise 0.8s ease-out forwards',
+                    animationDelay: `${index * 100}ms`,
+                    opacity: 0,
+                  }}
+                >
+                  <ResortCard resort={resort} index={index} />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Subtle branding */}
+      <div style={{ 
+        position: 'absolute', 
+        bottom: '1.5rem', 
+        left: '50%', 
+        transform: 'translateX(-50%)' 
+      }}>
+        <span style={{
+          fontFamily: "'Inter', system-ui, sans-serif",
+          fontWeight: 200,
+          letterSpacing: '0.3em',
+          textTransform: 'uppercase',
+          fontSize: '0.75rem',
+          color: 'hsl(30 15% 45% / 0.4)',
+        }}>
+          Voyage AI
+        </span>
+      </div>
+    </div>
   );
 };
 

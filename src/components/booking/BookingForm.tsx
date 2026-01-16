@@ -41,12 +41,10 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
   };
 
   const inputContainerStyle: React.CSSProperties = {
-    background: 'rgba(255, 255, 255, 0.03)',
-    backdropFilter: 'blur(20px)',
-    WebkitBackdropFilter: 'blur(20px)',
-    border: '1px solid rgba(205, 188, 174, 0.15)',
-    borderRadius: '16px',
-    padding: '16px 20px',
+    background: 'hsl(30 20% 96%)',
+    border: '1px solid hsl(30 15% 88%)',
+    borderRadius: '12px',
+    padding: '14px 18px',
     display: 'flex',
     alignItems: 'center',
     gap: '12px',
@@ -54,64 +52,56 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
     cursor: 'pointer',
   };
 
-  const inputContainerHoverStyle: React.CSSProperties = {
-    ...inputContainerStyle,
-    border: '1px solid rgba(205, 188, 174, 0.3)',
-    background: 'rgba(255, 255, 255, 0.05)',
-  };
-
   const labelStyle: React.CSSProperties = {
-    fontFamily: '"Cormorant Garamond", Georgia, serif',
-    fontSize: '11px',
-    fontWeight: 600,
-    letterSpacing: '0.15em',
+    fontFamily: '"Inter", system-ui, sans-serif',
+    fontSize: '10px',
+    fontWeight: 500,
+    letterSpacing: '0.12em',
     textTransform: 'uppercase' as const,
-    color: 'rgba(205, 188, 174, 0.7)',
+    color: 'hsl(30 15% 45%)',
     marginBottom: '4px',
   };
 
   const valueStyle: React.CSSProperties = {
     fontFamily: '"Inter", system-ui, sans-serif',
-    fontSize: '15px',
+    fontSize: '14px',
     fontWeight: 400,
-    color: '#F5F0EB',
+    color: 'hsl(30 20% 15%)',
   };
 
   const placeholderStyle: React.CSSProperties = {
     ...valueStyle,
-    color: 'rgba(205, 188, 174, 0.5)',
+    color: 'hsl(30 15% 60%)',
   };
 
   const iconStyle: React.CSSProperties = {
-    width: '20px',
-    height: '20px',
-    color: 'rgba(212, 175, 55, 0.8)',
+    width: '18px',
+    height: '18px',
+    color: 'hsl(15 55% 70%)',
     flexShrink: 0,
   };
 
   return (
     <div className={className} style={{
       width: '100%',
-      maxWidth: '900px',
+      maxWidth: '800px',
     }}>
       {/* Main Form Card */}
       <div style={{
-        background: 'rgba(45, 35, 28, 0.6)',
-        backdropFilter: 'blur(40px)',
-        WebkitBackdropFilter: 'blur(40px)',
-        border: '1px solid rgba(205, 188, 174, 0.12)',
-        borderRadius: '24px',
-        padding: '32px',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4)',
+        background: 'hsl(30 25% 98%)',
+        border: '1px solid hsl(30 15% 90%)',
+        borderRadius: '20px',
+        padding: '28px',
+        boxShadow: '0 8px 32px hsl(30 20% 15% / 0.08)',
       }}>
         {/* Form Title */}
         <h2 style={{
-          fontFamily: '"Cormorant Garamond", Georgia, serif',
-          fontSize: '28px',
+          fontFamily: '"Inter", system-ui, sans-serif',
+          fontSize: '22px',
           fontWeight: 300,
           letterSpacing: '0.02em',
-          color: '#F5F0EB',
-          marginBottom: '28px',
+          color: 'hsl(30 20% 15%)',
+          marginBottom: '24px',
           textAlign: 'center',
         }}>
           Find Your Perfect Stay
@@ -120,19 +110,21 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
         {/* Form Grid */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '16px',
-          marginBottom: '24px',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: '14px',
+          marginBottom: '20px',
         }}>
           {/* Destination Input */}
           <div style={{ gridColumn: 'span 2' }}>
             <div 
               style={inputContainerStyle}
               onMouseEnter={(e) => {
-                Object.assign(e.currentTarget.style, inputContainerHoverStyle);
+                e.currentTarget.style.borderColor = 'hsl(15 55% 70%)';
+                e.currentTarget.style.boxShadow = '0 2px 8px hsl(15 55% 70% / 0.15)';
               }}
               onMouseLeave={(e) => {
-                Object.assign(e.currentTarget.style, inputContainerStyle);
+                e.currentTarget.style.borderColor = 'hsl(30 15% 88%)';
+                e.currentTarget.style.boxShadow = 'none';
               }}
             >
               <MapPin style={iconStyle} />
@@ -162,10 +154,12 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
               <div 
                 style={inputContainerStyle}
                 onMouseEnter={(e) => {
-                  Object.assign(e.currentTarget.style, inputContainerHoverStyle);
+                  e.currentTarget.style.borderColor = 'hsl(15 55% 70%)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px hsl(15 55% 70% / 0.15)';
                 }}
                 onMouseLeave={(e) => {
-                  Object.assign(e.currentTarget.style, inputContainerStyle);
+                  e.currentTarget.style.borderColor = 'hsl(30 15% 88%)';
+                  e.currentTarget.style.boxShadow = 'none';
                 }}
               >
                 <Calendar style={iconStyle} />
@@ -181,10 +175,9 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
               className="w-auto p-0" 
               align="start"
               style={{
-                background: 'rgba(45, 35, 28, 0.95)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(205, 188, 174, 0.2)',
-                borderRadius: '16px',
+                background: 'hsl(30 25% 98%)',
+                border: '1px solid hsl(30 15% 88%)',
+                borderRadius: '12px',
               }}
             >
               <CalendarComponent
@@ -204,10 +197,12 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
               <div 
                 style={inputContainerStyle}
                 onMouseEnter={(e) => {
-                  Object.assign(e.currentTarget.style, inputContainerHoverStyle);
+                  e.currentTarget.style.borderColor = 'hsl(15 55% 70%)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px hsl(15 55% 70% / 0.15)';
                 }}
                 onMouseLeave={(e) => {
-                  Object.assign(e.currentTarget.style, inputContainerStyle);
+                  e.currentTarget.style.borderColor = 'hsl(30 15% 88%)';
+                  e.currentTarget.style.boxShadow = 'none';
                 }}
               >
                 <Calendar style={iconStyle} />
@@ -223,10 +218,9 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
               className="w-auto p-0" 
               align="start"
               style={{
-                background: 'rgba(45, 35, 28, 0.95)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(205, 188, 174, 0.2)',
-                borderRadius: '16px',
+                background: 'hsl(30 25% 98%)',
+                border: '1px solid hsl(30 15% 88%)',
+                borderRadius: '12px',
               }}
             >
               <CalendarComponent
@@ -249,10 +243,12 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
                 setShowGuestsDropdown(false);
               }}
               onMouseEnter={(e) => {
-                Object.assign(e.currentTarget.style, inputContainerHoverStyle);
+                e.currentTarget.style.borderColor = 'hsl(15 55% 70%)';
+                e.currentTarget.style.boxShadow = '0 2px 8px hsl(15 55% 70% / 0.15)';
               }}
               onMouseLeave={(e) => {
-                Object.assign(e.currentTarget.style, inputContainerStyle);
+                e.currentTarget.style.borderColor = 'hsl(30 15% 88%)';
+                e.currentTarget.style.boxShadow = 'none';
               }}
             >
               <Home style={iconStyle} />
@@ -260,7 +256,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
                 <div style={labelStyle}>Rooms</div>
                 <div style={valueStyle}>{rooms} {rooms === 1 ? 'Room' : 'Rooms'}</div>
               </div>
-              <ChevronDown style={{ ...iconStyle, color: 'rgba(205, 188, 174, 0.5)' }} />
+              <ChevronDown style={{ ...iconStyle, color: 'hsl(30 15% 60%)' }} />
             </div>
             
             {showRoomsDropdown && (
@@ -269,12 +265,12 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
                 top: 'calc(100% + 8px)',
                 left: 0,
                 right: 0,
-                background: 'rgba(45, 35, 28, 0.95)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(205, 188, 174, 0.2)',
-                borderRadius: '12px',
-                padding: '8px',
+                background: 'hsl(30 25% 98%)',
+                border: '1px solid hsl(30 15% 88%)',
+                borderRadius: '10px',
+                padding: '6px',
                 zIndex: 50,
+                boxShadow: '0 4px 16px hsl(30 20% 15% / 0.1)',
               }}>
                 {[1, 2, 3, 4, 5].map((num) => (
                   <div
@@ -284,20 +280,20 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
                       setShowRoomsDropdown(false);
                     }}
                     style={{
-                      padding: '10px 16px',
-                      borderRadius: '8px',
+                      padding: '10px 14px',
+                      borderRadius: '6px',
                       cursor: 'pointer',
                       ...valueStyle,
-                      background: rooms === num ? 'rgba(212, 175, 55, 0.15)' : 'transparent',
+                      background: rooms === num ? 'hsl(15 55% 70% / 0.15)' : 'transparent',
                       transition: 'background 0.2s ease',
                     }}
                     onMouseEnter={(e) => {
                       if (rooms !== num) {
-                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                        e.currentTarget.style.background = 'hsl(30 20% 94%)';
                       }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.background = rooms === num ? 'rgba(212, 175, 55, 0.15)' : 'transparent';
+                      e.currentTarget.style.background = rooms === num ? 'hsl(15 55% 70% / 0.15)' : 'transparent';
                     }}
                   >
                     {num} {num === 1 ? 'Room' : 'Rooms'}
@@ -316,10 +312,12 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
                 setShowRoomsDropdown(false);
               }}
               onMouseEnter={(e) => {
-                Object.assign(e.currentTarget.style, inputContainerHoverStyle);
+                e.currentTarget.style.borderColor = 'hsl(15 55% 70%)';
+                e.currentTarget.style.boxShadow = '0 2px 8px hsl(15 55% 70% / 0.15)';
               }}
               onMouseLeave={(e) => {
-                Object.assign(e.currentTarget.style, inputContainerStyle);
+                e.currentTarget.style.borderColor = 'hsl(30 15% 88%)';
+                e.currentTarget.style.boxShadow = 'none';
               }}
             >
               <Users style={iconStyle} />
@@ -327,7 +325,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
                 <div style={labelStyle}>Guests</div>
                 <div style={valueStyle}>{guests} {guests === 1 ? 'Guest' : 'Guests'}</div>
               </div>
-              <ChevronDown style={{ ...iconStyle, color: 'rgba(205, 188, 174, 0.5)' }} />
+              <ChevronDown style={{ ...iconStyle, color: 'hsl(30 15% 60%)' }} />
             </div>
             
             {showGuestsDropdown && (
@@ -336,12 +334,12 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
                 top: 'calc(100% + 8px)',
                 left: 0,
                 right: 0,
-                background: 'rgba(45, 35, 28, 0.95)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(205, 188, 174, 0.2)',
-                borderRadius: '12px',
-                padding: '8px',
+                background: 'hsl(30 25% 98%)',
+                border: '1px solid hsl(30 15% 88%)',
+                borderRadius: '10px',
+                padding: '6px',
                 zIndex: 50,
+                boxShadow: '0 4px 16px hsl(30 20% 15% / 0.1)',
               }}>
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
                   <div
@@ -351,20 +349,20 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
                       setShowGuestsDropdown(false);
                     }}
                     style={{
-                      padding: '10px 16px',
-                      borderRadius: '8px',
+                      padding: '10px 14px',
+                      borderRadius: '6px',
                       cursor: 'pointer',
                       ...valueStyle,
-                      background: guests === num ? 'rgba(212, 175, 55, 0.15)' : 'transparent',
+                      background: guests === num ? 'hsl(15 55% 70% / 0.15)' : 'transparent',
                       transition: 'background 0.2s ease',
                     }}
                     onMouseEnter={(e) => {
                       if (guests !== num) {
-                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                        e.currentTarget.style.background = 'hsl(30 20% 94%)';
                       }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.background = guests === num ? 'rgba(212, 175, 55, 0.15)' : 'transparent';
+                      e.currentTarget.style.background = guests === num ? 'hsl(15 55% 70% / 0.15)' : 'transparent';
                     }}
                   >
                     {num} {num === 1 ? 'Guest' : 'Guests'}
@@ -380,35 +378,35 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
           onClick={handleSearch}
           style={{
             width: '100%',
-            padding: '18px 32px',
-            background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.9) 0%, rgba(180, 140, 40, 0.9) 100%)',
+            padding: '16px 28px',
+            background: 'linear-gradient(135deg, hsl(15 55% 70%) 0%, hsl(25 50% 65%) 100%)',
             border: 'none',
-            borderRadius: '14px',
+            borderRadius: '12px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '12px',
+            gap: '10px',
             cursor: 'pointer',
             transition: 'all 0.3s ease',
-            boxShadow: '0 4px 20px rgba(212, 175, 55, 0.3)',
+            boxShadow: '0 4px 16px hsl(15 55% 70% / 0.3)',
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 8px 30px rgba(212, 175, 55, 0.4)';
+            e.currentTarget.style.boxShadow = '0 6px 24px hsl(15 55% 70% / 0.4)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 4px 20px rgba(212, 175, 55, 0.3)';
+            e.currentTarget.style.boxShadow = '0 4px 16px hsl(15 55% 70% / 0.3)';
           }}
         >
-          <Search style={{ width: '20px', height: '20px', color: '#1A1510' }} />
+          <Search style={{ width: '18px', height: '18px', color: 'hsl(30 25% 98%)' }} />
           <span style={{
-            fontFamily: '"Cormorant Garamond", Georgia, serif',
-            fontSize: '18px',
-            fontWeight: 600,
-            letterSpacing: '0.1em',
+            fontFamily: '"Inter", system-ui, sans-serif',
+            fontSize: '14px',
+            fontWeight: 500,
+            letterSpacing: '0.08em',
             textTransform: 'uppercase' as const,
-            color: '#1A1510',
+            color: 'hsl(30 25% 98%)',
           }}>
             Search Hotels
           </span>
