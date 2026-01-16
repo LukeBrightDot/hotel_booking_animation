@@ -826,7 +826,15 @@ export const FloatingLocations: React.FC<FloatingLocationsProps> = ({
   if (!isActive) return null;
 
   return (
-    <div className={`absolute inset-0 pointer-events-none overflow-visible ${className}`}>
+    <div 
+      className={className}
+      style={{
+        position: 'absolute',
+        inset: 0,
+        pointerEvents: 'none',
+        overflow: 'visible',
+      }}
+    >
       {locations.map((location) => {
         const x = Math.cos(location.angle) * location.radius;
         const y = Math.sin(location.angle) * location.radius;
@@ -835,15 +843,26 @@ export const FloatingLocations: React.FC<FloatingLocationsProps> = ({
         return (
           <div
             key={location.id}
-            className="absolute left-1/2 top-1/2 transition-opacity duration-1000"
             style={{
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
               transform: `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${location.scale * pulse})`,
               opacity: location.opacity,
+              transition: 'opacity 1000ms',
             }}
           >
             <span 
-              className="text-elegant text-xs tracking-[0.2em] text-muted-foreground/70 whitespace-nowrap
-                         transition-all duration-500"
+              style={{
+                fontFamily: "'Inter', system-ui, sans-serif",
+                fontWeight: 200,
+                letterSpacing: '0.2em',
+                textTransform: 'uppercase',
+                fontSize: '0.75rem',
+                color: 'hsl(30 15% 45% / 0.7)',
+                whiteSpace: 'nowrap',
+                transition: 'all 500ms',
+              }}
             >
               {location.name}
             </span>
@@ -1235,60 +1254,159 @@ export const VoiceAssistantLayout: React.FC<VoiceAssistantLayoutProps> = ({
   const [isSpeakerMuted, setIsSpeakerMuted] = useState(false);
 
   return (
-    <div className={`min-h-screen bg-background flex flex-col items-center px-6 pt-20 ${className}`}>
+    <div 
+      className={className}
+      style={{
+        minHeight: '100vh',
+        background: 'hsl(30 25% 98%)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        padding: '5rem 1.5rem 0',
+      }}
+    >
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-background/80 backdrop-blur-sm">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-            <span className="text-primary-foreground font-serif text-sm font-semibold">V</span>
+      <header 
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 50,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '1rem 1.5rem',
+          background: 'hsl(30 25% 98% / 0.8)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div 
+            style={{
+              width: '2rem',
+              height: '2rem',
+              borderRadius: '9999px',
+              background: 'linear-gradient(135deg, hsl(15 55% 70%), hsl(35 45% 75%))',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <span style={{ color: 'hsl(30 25% 98%)', fontWeight: 600, fontSize: '0.875rem' }}>V</span>
           </div>
-          <span className="font-serif text-lg tracking-wide text-foreground">Voyage</span>
+          <span style={{ fontSize: '1.125rem', letterSpacing: '0.05em', color: 'hsl(30 20% 15%)' }}>Voyage</span>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2">
-            <LogIn className="w-4 h-4" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <button
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.5rem 1rem',
+              fontSize: '0.875rem',
+              color: 'hsl(30 15% 45%)',
+              background: 'transparent',
+              border: 'none',
+              borderRadius: '0.5rem',
+              cursor: 'pointer',
+            }}
+          >
+            <LogIn style={{ width: '1rem', height: '1rem' }} />
             Login
           </button>
-          <button className="px-3 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors flex items-center gap-2">
-            <UserPlus className="w-4 h-4" />
+          <button
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.5rem 1rem',
+              fontSize: '0.875rem',
+              color: 'hsl(30 25% 98%)',
+              background: 'hsl(15 55% 70%)',
+              border: 'none',
+              borderRadius: '0.5rem',
+              cursor: 'pointer',
+            }}
+          >
+            <UserPlus style={{ width: '1rem', height: '1rem' }} />
             Join
           </button>
         </div>
       </header>
 
       {/* Audio controls */}
-      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">
+      <div style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem', zIndex: 50, display: 'flex', gap: '0.75rem' }}>
         <button
           onClick={() => setIsMicMuted(!isMicMuted)}
-          className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 shadow-md border
-                     ${isMicMuted 
-                       ? 'bg-destructive/20 text-destructive hover:bg-destructive/30 border-destructive/30' 
-                       : 'bg-card text-primary hover:bg-primary/10 border-border'}`}
+          style={{
+            width: '3rem',
+            height: '3rem',
+            borderRadius: '9999px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 300ms',
+            boxShadow: '0 4px 12px hsl(30 20% 15% / 0.1)',
+            border: isMicMuted ? '1px solid hsl(0 70% 50% / 0.3)' : '1px solid hsl(30 15% 88%)',
+            background: isMicMuted ? 'hsl(0 70% 50% / 0.2)' : 'hsl(30 20% 96%)',
+            color: isMicMuted ? 'hsl(0 70% 50%)' : 'hsl(15 55% 70%)',
+            cursor: 'pointer',
+          }}
           aria-label={isMicMuted ? 'Unmute microphone' : 'Mute microphone'}
         >
-          {isMicMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+          {isMicMuted ? <MicOff style={{ width: '1.25rem', height: '1.25rem' }} /> : <Mic style={{ width: '1.25rem', height: '1.25rem' }} />}
         </button>
         <button
           onClick={() => setIsSpeakerMuted(!isSpeakerMuted)}
-          className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 shadow-md border
-                     ${isSpeakerMuted 
-                       ? 'bg-destructive/20 text-destructive hover:bg-destructive/30 border-destructive/30' 
-                       : 'bg-card text-primary hover:bg-primary/10 border-border'}`}
+          style={{
+            width: '3rem',
+            height: '3rem',
+            borderRadius: '9999px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 300ms',
+            boxShadow: '0 4px 12px hsl(30 20% 15% / 0.1)',
+            border: isSpeakerMuted ? '1px solid hsl(0 70% 50% / 0.3)' : '1px solid hsl(30 15% 88%)',
+            background: isSpeakerMuted ? 'hsl(0 70% 50% / 0.2)' : 'hsl(30 20% 96%)',
+            color: isSpeakerMuted ? 'hsl(0 70% 50%)' : 'hsl(15 55% 70%)',
+            cursor: 'pointer',
+          }}
           aria-label={isSpeakerMuted ? 'Unmute speaker' : 'Mute speaker'}
         >
-          {isSpeakerMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+          {isSpeakerMuted ? <VolumeX style={{ width: '1.25rem', height: '1.25rem' }} /> : <Volume2 style={{ width: '1.25rem', height: '1.25rem' }} />}
         </button>
       </div>
 
       {/* Main visualization area */}
       <div 
-        className={`relative flex flex-col items-center w-full max-w-4xl transition-all duration-700 ease-out
-                   ${isCompact ? 'flex-none' : 'flex-1 justify-center'}`}
+        style={{
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          width: '100%',
+          maxWidth: '56rem',
+          transition: 'all 700ms ease-out',
+          flex: isCompact ? 'none' : 1,
+          justifyContent: isCompact ? 'flex-start' : 'center',
+        }}
       >
-        <div className="mb-6 transition-all duration-500">
-          <span className={`text-elegant text-muted-foreground transition-opacity duration-300
-                          ${state === 'searching' ? 'animate-pulse' : 'animate-pulse-soft'}`}>
+        <div style={{ marginBottom: '1.5rem', transition: 'all 500ms' }}>
+          <span 
+            style={{
+              fontFamily: "'Inter', system-ui, sans-serif",
+              fontWeight: 200,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              fontSize: '0.75rem',
+              color: 'hsl(30 15% 45%)',
+              animation: state === 'searching' ? 'pulse 1s infinite' : 'pulseSoft 4s ease-in-out infinite',
+            }}
+          >
             {state === 'idle' && 'Ready'}
             {state === 'listening' && 'Listening...'}
             {state === 'speaking' && 'Speaking'}
@@ -1298,8 +1416,12 @@ export const VoiceAssistantLayout: React.FC<VoiceAssistantLayoutProps> = ({
         </div>
 
         <div 
-          className={`relative transition-all duration-700 ease-out
-                     ${isCompact ? 'scale-75 -mb-8' : 'scale-100'}`}
+          style={{
+            position: 'relative',
+            transition: 'all 700ms ease-out',
+            transform: isCompact ? 'scale(0.75)' : 'scale(1)',
+            marginBottom: isCompact ? '-2rem' : 0,
+          }}
         >
           <ParticleVisualization 
             activity={getActivity()} 
@@ -1314,8 +1436,17 @@ export const VoiceAssistantLayout: React.FC<VoiceAssistantLayoutProps> = ({
         </div>
 
         <div 
-          className={`max-w-2xl w-full min-h-[80px] flex items-center justify-center transition-all duration-500
-                     ${isCompact ? 'mt-0 mb-6' : 'mt-8 mb-12'}`}
+          style={{
+            maxWidth: '42rem',
+            width: '100%',
+            minHeight: '80px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 500ms',
+            marginTop: isCompact ? 0 : '2rem',
+            marginBottom: isCompact ? '1.5rem' : '3rem',
+          }}
         >
           {transcript && (
             <AnimatedTranscript 
@@ -1329,16 +1460,32 @@ export const VoiceAssistantLayout: React.FC<VoiceAssistantLayoutProps> = ({
 
       {/* Results grid */}
       <div 
-        className={`w-full max-w-5xl px-4 pb-16 transition-all duration-700 ease-out
-                   ${showResults ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none'}`}
+        style={{
+          width: '100%',
+          maxWidth: '72rem',
+          padding: '0 1rem 4rem',
+          transition: 'all 700ms ease-out',
+          opacity: showResults ? 1 : 0,
+          transform: showResults ? 'translateY(0)' : 'translateY(2rem)',
+          pointerEvents: showResults ? 'auto' : 'none',
+        }}
       >
         {state === 'results' && results.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div 
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+              gap: '1.5rem',
+            }}
+          >
             {results.slice(0, visibleResultCount).map((resort, index) => (
               <div 
                 key={resort.id}
-                className="animate-fade-rise"
-                style={{ animationDelay: `${index * 100}ms` }}
+                style={{ 
+                  animation: 'fadeRise 0.8s ease-out forwards',
+                  animationDelay: `${index * 100}ms`,
+                  opacity: 0,
+                }}
               >
                 <ResortCard 
                   resort={resort}
@@ -1351,8 +1498,24 @@ export const VoiceAssistantLayout: React.FC<VoiceAssistantLayoutProps> = ({
       </div>
 
       {/* Branding */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2">
-        <span className="text-elegant text-muted-foreground/40 tracking-[0.3em]">
+      <div 
+        style={{ 
+          position: 'absolute', 
+          bottom: '1.5rem', 
+          left: '50%', 
+          transform: 'translateX(-50%)' 
+        }}
+      >
+        <span 
+          style={{
+            fontFamily: "'Inter', system-ui, sans-serif",
+            fontWeight: 200,
+            letterSpacing: '0.3em',
+            textTransform: 'uppercase',
+            fontSize: '0.75rem',
+            color: 'hsl(30 15% 45% / 0.4)',
+          }}
+        >
           Voyage AI
         </span>
       </div>

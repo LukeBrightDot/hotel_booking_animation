@@ -130,7 +130,15 @@ export const FloatingLocations: React.FC<FloatingLocationsProps> = ({
   if (!isActive) return null;
 
   return (
-    <div className={`absolute inset-0 pointer-events-none overflow-visible ${className}`}>
+    <div 
+      className={className}
+      style={{
+        position: 'absolute',
+        inset: 0,
+        pointerEvents: 'none',
+        overflow: 'visible',
+      }}
+    >
       {locations.map((location) => {
         const x = Math.cos(location.angle) * location.radius;
         const y = Math.sin(location.angle) * location.radius;
@@ -139,15 +147,26 @@ export const FloatingLocations: React.FC<FloatingLocationsProps> = ({
         return (
           <div
             key={location.id}
-            className="absolute left-1/2 top-1/2 transition-opacity duration-1000"
             style={{
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
               transform: `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${location.scale * pulse})`,
               opacity: location.opacity,
+              transition: 'opacity 1000ms',
             }}
           >
             <span 
-              className="text-elegant text-xs tracking-[0.2em] text-muted-foreground/70 whitespace-nowrap
-                         transition-all duration-500"
+              style={{
+                fontFamily: "'Inter', system-ui, sans-serif",
+                fontWeight: 200,
+                letterSpacing: '0.2em',
+                textTransform: 'uppercase',
+                fontSize: '0.75rem',
+                color: 'hsl(30 15% 45% / 0.7)',
+                whiteSpace: 'nowrap',
+                transition: 'all 500ms',
+              }}
             >
               {location.name}
             </span>
