@@ -258,7 +258,8 @@ export { ParticleVisualization } from './ParticleVisualization';
 export { AnimatedTranscript, StaticTranscript } from './AnimatedTranscript';
 export { FloatingLocations } from './FloatingLocations';
 export { ResortCard, type Resort } from './ResortCard';
-export { StateToggle } from './StateToggle';
+// Optional: Only include if you created StateToggle for demo purposes
+// export { StateToggle } from './StateToggle';
 ```
 
 ### 4C. Create `src/components/voice/ParticleVisualization.tsx`
@@ -918,7 +919,11 @@ export const ResortCard: React.FC<ResortCardProps> = ({
 export default ResortCard;
 ```
 
-### 4G. Create `src/components/voice/StateToggle.tsx`
+### 4G. (OPTIONAL) Create `src/components/voice/StateToggle.tsx`
+
+> **Note:** This component is ONLY for demo/testing purposes to manually switch states.
+> **Skip this file** if your voice assistant state is controlled by your real-time API (OpenAI Realtime, etc.).
+
 ```tsx
 "use client";
 
@@ -1207,11 +1212,41 @@ export default VoiceAssistantLayout;
 
 ## PHASE 5: Usage Example
 
+### For Real Integration (with OpenAI Realtime API)
+```tsx
+"use client";
+
+import { VoiceAssistantLayout, type DemoState, type Resort } from '@/components/voice';
+
+interface VoiceAssistantPageProps {
+  // These come from your OpenAI Realtime API integration
+  voiceState: DemoState;
+  transcriptText: string;
+  searchResults: Resort[];
+}
+
+export default function VoiceAssistantPage({ 
+  voiceState, 
+  transcriptText, 
+  searchResults 
+}: VoiceAssistantPageProps) {
+  return (
+    <VoiceAssistantLayout 
+      state={voiceState}           // From OpenAI WebSocket state
+      transcript={transcriptText}   // From Whisper transcription
+      results={searchResults}       // From your hotel search API
+    />
+  );
+}
+```
+
+### For Demo/Testing (with StateToggle)
 ```tsx
 "use client";
 
 import { useState } from 'react';
-import { VoiceAssistantLayout, StateToggle, type DemoState, type Resort } from '@/components/voice';
+import { VoiceAssistantLayout, type DemoState, type Resort } from '@/components/voice';
+import { StateToggle } from '@/components/voice/StateToggle'; // Only if you created it
 
 const SAMPLE_RESORTS: Resort[] = [
   {
@@ -1226,9 +1261,11 @@ const SAMPLE_RESORTS: Resort[] = [
   // ... more resorts
 ];
 
-export default function VoiceAssistantPage() {
+export default function DemoPage() {
   const [demoState, setDemoState] = useState<DemoState>('idle');
-  const [transcript, setTranscript] = useState('');
+  const transcript = demoState === 'speaking' 
+    ? "I found some wonderful beach resorts in Thailand for you..." 
+    : "";
 
   return (
     <>
