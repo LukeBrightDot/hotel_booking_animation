@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export interface Resort {
   id: string;
@@ -22,8 +23,15 @@ export const ResortCard: React.FC<ResortCardProps> = ({
   index = 0,
   className = '',
 }) => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(`/hotel/${resort.id}`);
+  };
+
   return (
     <div
+      onClick={handleClick}
       className={`group rounded-xl transition-all duration-500 cursor-pointer ${className}`}
       style={{
         background: 'hsl(30 20% 96% / 0.5)',
