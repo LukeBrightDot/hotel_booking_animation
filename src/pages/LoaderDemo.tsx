@@ -1,11 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { LuxuryLoader } from '@/components/ui/luxury-loader';
 import { LuxuryImage, LuxuryImagePlaceholder } from '@/components/ui/luxury-image';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, RotateCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const LoaderDemo: React.FC = () => {
   const navigate = useNavigate();
+  const [imageKey, setImageKey] = useState(0);
+
+  const reloadImages = () => {
+    setImageKey(prev => prev + 1);
+  };
 
   return (
     <div
@@ -386,6 +391,37 @@ const LoaderDemo: React.FC = () => {
             Watch the elegant shimmer transition to real images
           </p>
           
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
+            <button
+              onClick={reloadImages}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '12px 24px',
+                borderRadius: 12,
+                border: '1px solid hsl(30 20% 85%)',
+                background: 'hsl(30 25% 98%)',
+                cursor: 'pointer',
+                fontFamily: "'Inter', sans-serif",
+                fontSize: 13,
+                color: 'hsl(30 15% 40%)',
+                transition: 'all 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'hsl(30 20% 95%)';
+                e.currentTarget.style.borderColor = 'hsl(40 45% 55%)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'hsl(30 25% 98%)';
+                e.currentTarget.style.borderColor = 'hsl(30 20% 85%)';
+              }}
+            >
+              <RotateCcw size={16} />
+              Reload Images to See Animation
+            </button>
+          </div>
+          
           <div
             style={{
               display: 'grid',
@@ -394,25 +430,29 @@ const LoaderDemo: React.FC = () => {
             }}
           >
             <LuxuryImage 
-              src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80" 
+              key={`img1-${imageKey}`}
+              src={`https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80&t=${imageKey}`}
               alt="Luxury resort pool"
               aspectRatio="square"
               style={{ borderRadius: 12 }}
             />
             <LuxuryImage 
-              src="https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400&q=80" 
+              key={`img2-${imageKey}`}
+              src={`https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400&q=80&t=${imageKey}`}
               alt="Hotel room"
               aspectRatio="square"
               style={{ borderRadius: 12 }}
             />
             <LuxuryImage 
-              src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&q=80" 
+              key={`img3-${imageKey}`}
+              src={`https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&q=80&t=${imageKey}`}
               alt="Resort view"
               aspectRatio="square"
               style={{ borderRadius: 12 }}
             />
             <LuxuryImage 
-              src="https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=400&q=80" 
+              key={`img4-${imageKey}`}
+              src={`https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=400&q=80&t=${imageKey}`}
               alt="Hotel exterior"
               aspectRatio="square"
               style={{ borderRadius: 12 }}
