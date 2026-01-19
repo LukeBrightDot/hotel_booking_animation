@@ -1,5 +1,6 @@
 import React from 'react';
 import { LuxuryLoader } from '@/components/ui/luxury-loader';
+import { LuxuryImage, LuxuryImagePlaceholder } from '@/components/ui/luxury-image';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -278,6 +279,148 @@ const LoaderDemo: React.FC = () => {
         </div>
       </div>
 
+      {/* Image Placeholder Section */}
+      <div style={{ maxWidth: 1200, margin: '80px auto 0' }}>
+        <h2
+          style={{
+            fontFamily: "'Cormorant Garamond', serif",
+            fontSize: 36,
+            fontWeight: 300,
+            color: 'hsl(30 15% 15%)',
+            marginBottom: 12,
+            textAlign: 'center',
+          }}
+        >
+          Image Placeholders
+        </h2>
+        <p
+          style={{
+            fontFamily: "'Inter', sans-serif",
+            fontSize: 16,
+            fontWeight: 300,
+            color: 'hsl(30 10% 50%)',
+            textAlign: 'center',
+            marginBottom: 48,
+          }}
+        >
+          Elegant shimmer placeholders for lazy-loaded images with smooth fade-in transitions.
+        </p>
+
+        {/* Placeholder Grid */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: 24,
+            marginBottom: 48,
+          }}
+        >
+          <div>
+            <LuxuryImagePlaceholder aspectRatio="video" />
+            <p style={{ 
+              fontFamily: "'Inter', sans-serif",
+              fontSize: 12,
+              color: 'hsl(30 10% 50%)',
+              marginTop: 12,
+              textAlign: 'center',
+            }}>
+              Video (16:9)
+            </p>
+          </div>
+          <div>
+            <LuxuryImagePlaceholder aspectRatio="square" />
+            <p style={{ 
+              fontFamily: "'Inter', sans-serif",
+              fontSize: 12,
+              color: 'hsl(30 10% 50%)',
+              marginTop: 12,
+              textAlign: 'center',
+            }}>
+              Square (1:1)
+            </p>
+          </div>
+          <div>
+            <LuxuryImagePlaceholder aspectRatio="wide" />
+            <p style={{ 
+              fontFamily: "'Inter', sans-serif",
+              fontSize: 12,
+              color: 'hsl(30 10% 50%)',
+              marginTop: 12,
+              textAlign: 'center',
+            }}>
+              Wide (3:2)
+            </p>
+          </div>
+        </div>
+
+        {/* Live Image Loading Demo */}
+        <div
+          style={{
+            background: 'hsl(30 20% 96%)',
+            borderRadius: 24,
+            padding: 32,
+            border: '1px solid hsl(30 20% 90%)',
+          }}
+        >
+          <h3
+            style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: 24,
+              fontWeight: 400,
+              color: 'hsl(30 15% 20%)',
+              marginBottom: 8,
+              textAlign: 'center',
+            }}
+          >
+            Live Loading Demo
+          </h3>
+          <p
+            style={{
+              fontFamily: "'Inter', sans-serif",
+              fontSize: 13,
+              color: 'hsl(30 10% 50%)',
+              marginBottom: 24,
+              textAlign: 'center',
+            }}
+          >
+            Watch the elegant shimmer transition to real images
+          </p>
+          
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: 16,
+            }}
+          >
+            <LuxuryImage 
+              src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80" 
+              alt="Luxury resort pool"
+              aspectRatio="square"
+              style={{ borderRadius: 12 }}
+            />
+            <LuxuryImage 
+              src="https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400&q=80" 
+              alt="Hotel room"
+              aspectRatio="square"
+              style={{ borderRadius: 12 }}
+            />
+            <LuxuryImage 
+              src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&q=80" 
+              alt="Resort view"
+              aspectRatio="square"
+              style={{ borderRadius: 12 }}
+            />
+            <LuxuryImage 
+              src="https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=400&q=80" 
+              alt="Hotel exterior"
+              aspectRatio="square"
+              style={{ borderRadius: 12 }}
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Usage Example */}
       <div
         style={{
@@ -293,13 +436,23 @@ const LoaderDemo: React.FC = () => {
         }}
       >
         <pre style={{ margin: 0 }}>
-{`// Import the component
+{`// Import the components
 import { LuxuryLoader } from '@/components/ui/luxury-loader';
+import { LuxuryImage, LuxuryImagePlaceholder } from '@/components/ui/luxury-image';
 
-// Usage examples
+// Loader examples
 <LuxuryLoader variant="orb" size="lg" text="Loading" />
 <LuxuryLoader variant="dots" size="md" />
-<LuxuryLoader variant="pulse" size="sm" text="Processing" />`}
+
+// Image with auto fade-in on load
+<LuxuryImage 
+  src="/hotel-photo.jpg" 
+  alt="Hotel" 
+  aspectRatio="video" 
+/>
+
+// Static placeholder for skeleton grids
+<LuxuryImagePlaceholder aspectRatio="square" />`}
         </pre>
       </div>
     </div>
