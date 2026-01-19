@@ -401,3 +401,24 @@
     opacity: 1;
   }
 }
+
+/* Luxury Image Placeholder Animations */
+@keyframes luxuryShimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes luxuryPulse {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.05);
+  }
+}
