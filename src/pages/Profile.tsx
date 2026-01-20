@@ -1,93 +1,46 @@
 "use client";
 
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
-import { User, Bed, Eye, Building, Wallet, Heart, Award, FileText, Save, ChevronDown } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
+import { 
+  User, 
+  Search, 
+  Calendar, 
+  Clock, 
+  ChevronRight, 
+  Save,
+  Mail,
+  Phone
+} from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 const Profile = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [preferences, setPreferences] = useState({
-    floorPreference: "",
-    bedType: "",
-    viewPreference: "",
-    quietRoom: false,
-    accessibleRoom: false,
-    smokingRoom: false,
-    travelPurpose: "",
-    budgetRange: "",
-    amenities: [] as string[],
-    loyaltyPrograms: [] as string[],
-    dietaryRestrictions: "",
-    specialNeeds: "",
+  const [personalInfo, setPersonalInfo] = useState({
+    firstName: "",
+    lastName: "",
+    email: "user@example.com",
+    phone: "",
   });
 
-  const handleAmenityToggle = (amenity: string) => {
-    setPreferences((prev) => ({
-      ...prev,
-      amenities: prev.amenities.includes(amenity)
-        ? prev.amenities.filter((a) => a !== amenity)
-        : [...prev.amenities, amenity],
-    }));
-  };
-
-  const handleLoyaltyToggle = (program: string) => {
-    setPreferences((prev) => ({
-      ...prev,
-      loyaltyPrograms: prev.loyaltyPrograms.includes(program)
-        ? prev.loyaltyPrograms.filter((p) => p !== program)
-        : [...prev.loyaltyPrograms, program],
-    }));
+  // Mock stats - would come from API
+  const stats = {
+    searches: 0,
+    bookings: 0,
+    memberSince: "Jan 2026",
   };
 
   const handleSave = async () => {
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 1500));
     setIsLoading(false);
-    toast.success("Preferences saved successfully", {
-      description: "Your travel preferences have been updated.",
+    toast.success("Profile updated successfully", {
+      description: "Your personal information has been saved.",
     });
   };
-
-  const floorOptions = ["No Preference", "High Floor", "Low Floor"];
-  const bedOptions = ["No Preference", "King Bed", "Queen Bed", "Double Beds", "Twin Beds"];
-  const viewOptions = ["No Preference", "Ocean View", "City View", "Garden View", "Pool View"];
-  const travelPurposeOptions = ["No Preference", "Business Travel", "Leisure/Vacation", "Family Travel", "Romantic Getaway"];
-  const budgetOptions = [
-    "No Preference",
-    "Budget-Friendly (Under $150/night)",
-    "Moderate ($150-300/night)",
-    "Luxury ($300-600/night)",
-    "Ultra-Luxury ($600+/night)",
-  ];
-  const amenitiesOptions = [
-    "Gym/Fitness",
-    "Swimming Pool",
-    "Spa & Wellness",
-    "On-site Restaurant",
-    "Business Center",
-    "Concierge Service",
-  ];
-  const loyaltyOptions = [
-    "Marriott Bonvoy",
-    "Hilton Honors",
-    "IHG One Rewards",
-    "World of Hyatt",
-    "Wyndham Rewards",
-    "Accor Live Limitless",
-    "Best Western Rewards",
-    "Radisson Rewards",
-  ];
 
   return (
     <div
@@ -146,14 +99,15 @@ const Profile = () => {
               display: "inline-flex",
               alignItems: "center",
               justifyContent: "center",
-              width: "4rem",
-              height: "4rem",
+              width: "4.5rem",
+              height: "4.5rem",
               borderRadius: "50%",
               background: "linear-gradient(135deg, hsla(40, 45%, 55%, 0.15) 0%, hsla(40, 45%, 55%, 0.05) 100%)",
               marginBottom: "1.5rem",
+              border: "2px solid hsla(40, 45%, 55%, 0.2)",
             }}
           >
-            <User style={{ width: "1.75rem", height: "1.75rem", color: "hsl(40 45% 45%)" }} />
+            <User style={{ width: "2rem", height: "2rem", color: "hsl(40 45% 45%)" }} />
           </div>
           <h1
             style={{
@@ -165,7 +119,7 @@ const Profile = () => {
               marginBottom: "0.75rem",
             }}
           >
-            Travel Preferences
+            My Profile
           </h1>
           <p
             style={{
@@ -177,225 +131,213 @@ const Profile = () => {
               margin: "0 auto",
             }}
           >
-            Customize your hotel search experience. These preferences will be used by our voice assistant.
+            Manage your account information and preferences
           </p>
         </div>
 
-        {/* Room Preferences Section */}
-        <SectionCard
-          icon={<Bed style={{ width: "1.25rem", height: "1.25rem", color: "hsl(40 45% 45%)" }} />}
-          title="Room Preferences"
+        {/* Stats Cards */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: "1rem",
+            marginBottom: "1.5rem",
+          }}
         >
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1.25rem" }}>
-            <SelectField
-              label="FLOOR PREFERENCE"
-              value={preferences.floorPreference}
-              onChange={(v) => setPreferences({ ...preferences, floorPreference: v })}
-              options={floorOptions}
-            />
-            <SelectField
-              label="BED TYPE"
-              value={preferences.bedType}
-              onChange={(v) => setPreferences({ ...preferences, bedType: v })}
-              options={bedOptions}
-            />
-            <SelectField
-              label="VIEW PREFERENCE"
-              value={preferences.viewPreference}
-              onChange={(v) => setPreferences({ ...preferences, viewPreference: v })}
-              options={viewOptions}
-            />
-          </div>
+          <StatCard icon={<Search />} value={stats.searches} label="SEARCHES" />
+          <StatCard icon={<Calendar />} value={stats.bookings} label="BOOKINGS" />
+          <StatCard icon={<Clock />} value={stats.memberSince} label="MEMBER SINCE" />
+        </div>
 
-          <div style={{ marginTop: "1.5rem", display: "flex", flexWrap: "wrap", gap: "1rem" }}>
-            <CheckboxField
-              id="quietRoom"
-              checked={preferences.quietRoom}
-              onChange={(c) => setPreferences({ ...preferences, quietRoom: c })}
-              label="Quiet Room (away from elevators, ice machines)"
-            />
-            <CheckboxField
-              id="accessibleRoom"
-              checked={preferences.accessibleRoom}
-              onChange={(c) => setPreferences({ ...preferences, accessibleRoom: c })}
-              label="Accessible Room"
-            />
-            <CheckboxField
-              id="smokingRoom"
-              checked={preferences.smokingRoom}
-              onChange={(c) => setPreferences({ ...preferences, smokingRoom: c })}
-              label="Smoking Room"
-            />
-          </div>
-        </SectionCard>
-
-        {/* Travel Style Section */}
-        <SectionCard
-          icon={<Building style={{ width: "1.25rem", height: "1.25rem", color: "hsl(40 45% 45%)" }} />}
-          title="Travel Style"
-        >
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1.25rem" }}>
-            <SelectField
-              label="PRIMARY TRAVEL PURPOSE"
-              value={preferences.travelPurpose}
-              onChange={(v) => setPreferences({ ...preferences, travelPurpose: v })}
-              options={travelPurposeOptions}
-            />
-            <SelectField
-              label="BUDGET RANGE"
-              value={preferences.budgetRange}
-              onChange={(v) => setPreferences({ ...preferences, budgetRange: v })}
-              options={budgetOptions}
-            />
-          </div>
-        </SectionCard>
-
-        {/* Preferred Amenities Section */}
-        <SectionCard
-          icon={<Heart style={{ width: "1.25rem", height: "1.25rem", color: "hsl(40 45% 45%)" }} />}
-          title="Preferred Amenities"
-        >
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem" }}>
-            {amenitiesOptions.map((amenity) => (
-              <ChipCheckbox
-                key={amenity}
-                label={amenity}
-                checked={preferences.amenities.includes(amenity)}
-                onChange={() => handleAmenityToggle(amenity)}
-              />
-            ))}
-          </div>
-        </SectionCard>
-
-        {/* Loyalty Programs Section */}
-        <SectionCard
-          icon={<Award style={{ width: "1.25rem", height: "1.25rem", color: "hsl(40 45% 45%)" }} />}
-          title="Loyalty Programs"
-          subtitle="Select the loyalty programs you're a member of"
-        >
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem" }}>
-            {loyaltyOptions.map((program) => (
-              <ChipCheckbox
-                key={program}
-                label={program}
-                checked={preferences.loyaltyPrograms.includes(program)}
-                onChange={() => handleLoyaltyToggle(program)}
-              />
-            ))}
-          </div>
-        </SectionCard>
-
-        {/* Special Requirements Section */}
-        <SectionCard
-          icon={<FileText style={{ width: "1.25rem", height: "1.25rem", color: "hsl(40 45% 45%)" }} />}
-          title="Special Requirements"
-        >
-          <div style={{ display: "grid", gap: "1.25rem" }}>
-            <div>
-              <Label
-                style={{
-                  fontSize: "0.6875rem",
-                  fontWeight: 500,
-                  letterSpacing: "0.08em",
-                  textTransform: "uppercase",
-                  color: "hsl(30 10% 45%)",
-                  marginBottom: "0.5rem",
-                  display: "block",
-                }}
-              >
-                DIETARY RESTRICTIONS
-              </Label>
-              <Textarea
-                value={preferences.dietaryRestrictions}
-                onChange={(e) => setPreferences({ ...preferences, dietaryRestrictions: e.target.value })}
-                placeholder="e.g., Vegetarian, Vegan, Gluten-free, Allergies..."
-                style={{
-                  background: "hsla(30, 25%, 98%, 0.8)",
-                  border: "1px solid hsla(40, 30%, 75%, 0.4)",
-                  borderRadius: "0.75rem",
-                  padding: "0.875rem 1rem",
-                  fontSize: "0.9375rem",
-                  color: "hsl(30 15% 20%)",
-                  fontFamily: "'Inter', sans-serif",
-                  minHeight: "5rem",
-                  resize: "vertical",
-                }}
-              />
-            </div>
-            <div>
-              <Label
-                style={{
-                  fontSize: "0.6875rem",
-                  fontWeight: 500,
-                  letterSpacing: "0.08em",
-                  textTransform: "uppercase",
-                  color: "hsl(30 10% 45%)",
-                  marginBottom: "0.5rem",
-                  display: "block",
-                }}
-              >
-                SPECIAL NEEDS OR REQUESTS
-              </Label>
-              <Textarea
-                value={preferences.specialNeeds}
-                onChange={(e) => setPreferences({ ...preferences, specialNeeds: e.target.value })}
-                placeholder="Any additional requirements or preferences..."
-                style={{
-                  background: "hsla(30, 25%, 98%, 0.8)",
-                  border: "1px solid hsla(40, 30%, 75%, 0.4)",
-                  borderRadius: "0.75rem",
-                  padding: "0.875rem 1rem",
-                  fontSize: "0.9375rem",
-                  color: "hsl(30 15% 20%)",
-                  fontFamily: "'Inter', sans-serif",
-                  minHeight: "5rem",
-                  resize: "vertical",
-                }}
-              />
-            </div>
-          </div>
-        </SectionCard>
-
-        {/* Save Button */}
-        <div style={{ marginTop: "2rem", display: "flex", justifyContent: "center" }}>
-          <Button
-            onClick={handleSave}
-            disabled={isLoading}
+        {/* Travel Preferences Link Card */}
+        <Link to="/profile/preferences" style={{ textDecoration: "none" }}>
+          <div
             style={{
-              background: "linear-gradient(135deg, hsl(40 45% 50%) 0%, hsl(40 45% 42%) 100%)",
-              color: "hsl(40 30% 98%)",
-              fontFamily: "'Inter', sans-serif",
-              fontSize: "0.9375rem",
-              fontWeight: 400,
-              letterSpacing: "0.02em",
-              padding: "1rem 2.5rem",
-              borderRadius: "0.75rem",
-              border: "none",
-              cursor: isLoading ? "not-allowed" : "pointer",
-              opacity: isLoading ? 0.7 : 1,
-              boxShadow: "0 4px 20px -4px hsla(40, 45%, 40%, 0.35)",
-              transition: "all 0.3s ease",
+              background: "linear-gradient(135deg, hsla(40, 45%, 55%, 0.12) 0%, hsla(40, 45%, 55%, 0.06) 100%)",
+              backdropFilter: "blur(20px)",
+              WebkitBackdropFilter: "blur(20px)",
+              border: "1px solid hsla(40, 45%, 55%, 0.25)",
+              borderRadius: "1.25rem",
+              padding: "1.25rem 1.5rem",
+              marginBottom: "1.5rem",
               display: "flex",
               alignItems: "center",
-              gap: "0.625rem",
+              justifyContent: "space-between",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "linear-gradient(135deg, hsla(40, 45%, 55%, 0.18) 0%, hsla(40, 45%, 55%, 0.10) 100%)";
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow = "0 8px 32px -8px hsla(40, 45%, 40%, 0.2)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "linear-gradient(135deg, hsla(40, 45%, 55%, 0.12) 0%, hsla(40, 45%, 55%, 0.06) 100%)";
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "none";
             }}
           >
-            {isLoading ? (
+            <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
               <div
                 style={{
-                  width: "1.125rem",
-                  height: "1.125rem",
-                  border: "2px solid hsla(40, 30%, 98%, 0.3)",
-                  borderTopColor: "hsl(40 30% 98%)",
-                  borderRadius: "50%",
-                  animation: "spin 0.8s linear infinite",
+                  width: "2.5rem",
+                  height: "2.5rem",
+                  borderRadius: "0.75rem",
+                  background: "linear-gradient(135deg, hsl(40 45% 50%) 0%, hsl(40 45% 42%) 100%)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 4px 12px -4px hsla(40, 45%, 40%, 0.4)",
                 }}
-              />
-            ) : (
-              <Save style={{ width: "1.125rem", height: "1.125rem" }} />
-            )}
-            {isLoading ? "Saving..." : "Save Preferences"}
-          </Button>
+              >
+                <svg
+                  style={{ width: "1.25rem", height: "1.25rem", color: "hsl(40 30% 98%)" }}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h3
+                  style={{
+                    fontFamily: "'Cormorant Garamond', Georgia, serif",
+                    fontSize: "1.25rem",
+                    fontWeight: 500,
+                    color: "hsl(30 15% 20%)",
+                    marginBottom: "0.125rem",
+                  }}
+                >
+                  Travel Preferences
+                </h3>
+                <p
+                  style={{
+                    fontSize: "0.8125rem",
+                    color: "hsl(30 10% 45%)",
+                    fontWeight: 300,
+                  }}
+                >
+                  Room, amenities, loyalty programs & more
+                </p>
+              </div>
+            </div>
+            <ChevronRight style={{ width: "1.25rem", height: "1.25rem", color: "hsl(40 45% 45%)" }} />
+          </div>
+        </Link>
+
+        {/* Personal Information Card */}
+        <div
+          style={{
+            background: "hsla(30, 25%, 99%, 0.7)",
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            border: "1px solid hsla(40, 30%, 85%, 0.5)",
+            borderRadius: "1.25rem",
+            padding: "1.75rem",
+            boxShadow: "0 4px 24px -8px hsla(30, 20%, 30%, 0.08)",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1.5rem" }}>
+            <User style={{ width: "1.25rem", height: "1.25rem", color: "hsl(40 45% 45%)" }} />
+            <h2
+              style={{
+                fontFamily: "'Cormorant Garamond', Georgia, serif",
+                fontSize: "1.375rem",
+                fontWeight: 400,
+                color: "hsl(30 15% 20%)",
+                letterSpacing: "-0.01em",
+              }}
+            >
+              Personal Information
+            </h2>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1.25rem" }}>
+            <InputField
+              label="FIRST NAME"
+              value={personalInfo.firstName}
+              onChange={(v) => setPersonalInfo({ ...personalInfo, firstName: v })}
+              placeholder="Enter your first name"
+              icon={<User style={{ width: "1rem", height: "1rem" }} />}
+            />
+            <InputField
+              label="LAST NAME"
+              value={personalInfo.lastName}
+              onChange={(v) => setPersonalInfo({ ...personalInfo, lastName: v })}
+              placeholder="Enter your last name"
+              icon={<User style={{ width: "1rem", height: "1rem" }} />}
+            />
+            <InputField
+              label="EMAIL ADDRESS"
+              value={personalInfo.email}
+              onChange={() => {}}
+              placeholder="Your email"
+              icon={<Mail style={{ width: "1rem", height: "1rem" }} />}
+              disabled
+              helperText="Email cannot be changed"
+            />
+            <InputField
+              label="PHONE NUMBER"
+              value={personalInfo.phone}
+              onChange={(v) => setPersonalInfo({ ...personalInfo, phone: v })}
+              placeholder="+1 (555) 000-0000"
+              icon={<Phone style={{ width: "1rem", height: "1rem" }} />}
+            />
+          </div>
+
+          {/* Save Button */}
+          <div style={{ marginTop: "1.75rem", display: "flex", justifyContent: "flex-end" }}>
+            <Button
+              onClick={handleSave}
+              disabled={isLoading}
+              style={{
+                background: "linear-gradient(135deg, hsl(40 45% 50%) 0%, hsl(40 45% 42%) 100%)",
+                color: "hsl(40 30% 98%)",
+                fontFamily: "'Inter', sans-serif",
+                fontSize: "0.875rem",
+                fontWeight: 400,
+                letterSpacing: "0.02em",
+                padding: "0.75rem 1.75rem",
+                borderRadius: "0.75rem",
+                border: "none",
+                cursor: isLoading ? "not-allowed" : "pointer",
+                opacity: isLoading ? 0.7 : 1,
+                boxShadow: "0 4px 20px -4px hsla(40, 45%, 40%, 0.35)",
+                transition: "all 0.3s ease",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+              }}
+            >
+              {isLoading ? (
+                <div
+                  style={{
+                    width: "1rem",
+                    height: "1rem",
+                    border: "2px solid hsla(40, 30%, 98%, 0.3)",
+                    borderTopColor: "hsl(40 30% 98%)",
+                    borderRadius: "50%",
+                    animation: "spin 0.8s linear infinite",
+                  }}
+                />
+              ) : (
+                <Save style={{ width: "1rem", height: "1rem" }} />
+              )}
+              {isLoading ? "Saving..." : "Save Changes"}
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -415,17 +357,15 @@ const Profile = () => {
   );
 };
 
-/* Section Card Component */
-const SectionCard = ({
+/* Stat Card Component */
+const StatCard = ({
   icon,
-  title,
-  subtitle,
-  children,
+  value,
+  label,
 }: {
   icon: React.ReactNode;
-  title: string;
-  subtitle?: string;
-  children: React.ReactNode;
+  value: string | number;
+  label: string;
 }) => (
   <div
     style={{
@@ -433,54 +373,69 @@ const SectionCard = ({
       backdropFilter: "blur(20px)",
       WebkitBackdropFilter: "blur(20px)",
       border: "1px solid hsla(40, 30%, 85%, 0.5)",
-      borderRadius: "1.25rem",
-      padding: "1.75rem",
-      marginBottom: "1.25rem",
-      boxShadow: "0 4px 24px -8px hsla(30, 20%, 30%, 0.08)",
+      borderRadius: "1rem",
+      padding: "1.25rem",
+      textAlign: "center",
+      boxShadow: "0 4px 24px -8px hsla(30, 20%, 30%, 0.06)",
     }}
   >
-    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: subtitle ? "0.375rem" : "1.25rem" }}>
-      {icon}
-      <h2
-        style={{
-          fontFamily: "'Cormorant Garamond', Georgia, serif",
-          fontSize: "1.375rem",
-          fontWeight: 400,
-          color: "hsl(30 15% 20%)",
-          letterSpacing: "-0.01em",
-        }}
-      >
-        {title}
-      </h2>
+    <div
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "2.5rem",
+        height: "2.5rem",
+        borderRadius: "0.625rem",
+        background: "linear-gradient(135deg, hsla(40, 45%, 55%, 0.12) 0%, hsla(40, 45%, 55%, 0.06) 100%)",
+        marginBottom: "0.75rem",
+        color: "hsl(40 45% 45%)",
+      }}
+    >
+      {React.cloneElement(icon as React.ReactElement, { style: { width: "1.125rem", height: "1.125rem" } })}
     </div>
-    {subtitle && (
-      <p
-        style={{
-          fontSize: "0.8125rem",
-          color: "hsl(30 10% 50%)",
-          fontWeight: 300,
-          marginBottom: "1.25rem",
-          marginLeft: "2rem",
-        }}
-      >
-        {subtitle}
-      </p>
-    )}
-    {children}
+    <div
+      style={{
+        fontFamily: "'Cormorant Garamond', Georgia, serif",
+        fontSize: "1.5rem",
+        fontWeight: 500,
+        color: "hsl(30 15% 20%)",
+        marginBottom: "0.25rem",
+      }}
+    >
+      {value}
+    </div>
+    <div
+      style={{
+        fontSize: "0.625rem",
+        fontWeight: 500,
+        letterSpacing: "0.1em",
+        textTransform: "uppercase",
+        color: "hsl(30 10% 50%)",
+      }}
+    >
+      {label}
+    </div>
   </div>
 );
 
-/* Select Field Component */
-const SelectField = ({
+/* Input Field Component */
+const InputField = ({
   label,
   value,
   onChange,
-  options,
+  placeholder,
+  icon,
+  disabled = false,
+  helperText,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
-  options: string[];
+  placeholder: string;
+  icon?: React.ReactNode;
+  disabled?: boolean;
+  helperText?: string;
 }) => (
   <div>
     <Label
@@ -496,117 +451,53 @@ const SelectField = ({
     >
       {label}
     </Label>
-    <Select value={value} onValueChange={onChange}>
-      <SelectTrigger
+    <div style={{ position: "relative" }}>
+      {icon && (
+        <div
+          style={{
+            position: "absolute",
+            left: "1rem",
+            top: "50%",
+            transform: "translateY(-50%)",
+            color: disabled ? "hsl(30 10% 60%)" : "hsl(30 10% 45%)",
+            pointerEvents: "none",
+          }}
+        >
+          {icon}
+        </div>
+      )}
+      <Input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        disabled={disabled}
         style={{
-          background: "hsla(30, 25%, 98%, 0.8)",
+          background: disabled ? "hsla(30, 20%, 95%, 0.8)" : "hsla(30, 25%, 98%, 0.8)",
           border: "1px solid hsla(40, 30%, 75%, 0.4)",
           borderRadius: "0.75rem",
-          padding: "0.75rem 1rem",
+          padding: icon ? "0.75rem 1rem 0.75rem 2.75rem" : "0.75rem 1rem",
           fontSize: "0.9375rem",
-          color: value ? "hsl(30 15% 20%)" : "hsl(30 10% 55%)",
+          color: disabled ? "hsl(30 10% 50%)" : "hsl(30 15% 20%)",
           fontFamily: "'Inter', sans-serif",
           height: "3rem",
+          cursor: disabled ? "not-allowed" : "text",
+          opacity: disabled ? 0.8 : 1,
         }}
-      >
-        <SelectValue placeholder="Select..." />
-      </SelectTrigger>
-      <SelectContent
+      />
+    </div>
+    {helperText && (
+      <p
         style={{
-          background: "hsl(30 25% 98%)",
-          border: "1px solid hsla(40, 30%, 75%, 0.5)",
-          borderRadius: "0.75rem",
-          boxShadow: "0 8px 32px -8px hsla(30, 20%, 30%, 0.15)",
+          fontSize: "0.75rem",
+          color: "hsl(30 10% 55%)",
+          marginTop: "0.375rem",
+          fontStyle: "italic",
         }}
       >
-        {options.map((option) => (
-          <SelectItem
-            key={option}
-            value={option}
-            style={{
-              fontFamily: "'Inter', sans-serif",
-              fontSize: "0.9375rem",
-              color: "hsl(30 15% 25%)",
-              padding: "0.625rem 1rem",
-            }}
-          >
-            {option}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+        {helperText}
+      </p>
+    )}
   </div>
-);
-
-/* Checkbox Field Component */
-const CheckboxField = ({
-  id,
-  checked,
-  onChange,
-  label,
-}: {
-  id: string;
-  checked: boolean;
-  onChange: (c: boolean) => void;
-  label: string;
-}) => (
-  <div style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}>
-    <Checkbox
-      id={id}
-      checked={checked}
-      onCheckedChange={onChange}
-      style={{
-        width: "1.125rem",
-        height: "1.125rem",
-        borderRadius: "0.25rem",
-        border: "1.5px solid hsla(40, 30%, 60%, 0.6)",
-        background: checked ? "hsl(40 45% 50%)" : "transparent",
-      }}
-    />
-    <Label
-      htmlFor={id}
-      style={{
-        fontSize: "0.875rem",
-        color: "hsl(30 15% 30%)",
-        fontWeight: 400,
-        cursor: "pointer",
-      }}
-    >
-      {label}
-    </Label>
-  </div>
-);
-
-/* Chip Checkbox Component */
-const ChipCheckbox = ({
-  label,
-  checked,
-  onChange,
-}: {
-  label: string;
-  checked: boolean;
-  onChange: () => void;
-}) => (
-  <button
-    onClick={onChange}
-    style={{
-      background: checked
-        ? "linear-gradient(135deg, hsl(40 45% 50%) 0%, hsl(40 45% 45%) 100%)"
-        : "hsla(30, 25%, 98%, 0.8)",
-      color: checked ? "hsl(40 30% 98%)" : "hsl(30 15% 35%)",
-      border: checked ? "1px solid hsl(40 45% 45%)" : "1px solid hsla(40, 30%, 75%, 0.5)",
-      borderRadius: "2rem",
-      padding: "0.5rem 1rem",
-      fontSize: "0.8125rem",
-      fontFamily: "'Inter', sans-serif",
-      fontWeight: 400,
-      cursor: "pointer",
-      transition: "all 0.2s ease",
-      boxShadow: checked ? "0 2px 8px -2px hsla(40, 45%, 40%, 0.3)" : "none",
-    }}
-  >
-    {label}
-  </button>
 );
 
 export default Profile;

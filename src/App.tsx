@@ -8,6 +8,7 @@ import HotelDetail from "./pages/HotelDetail";
 import LoaderDemo from "./pages/LoaderDemo";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
+import ProfilePreferences from "./pages/ProfilePreferences";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/preferences" element={<ProfilePreferences />} />
           <Route path="/hotel/:hotelId" element={<HotelDetail />} />
           <Route path="/loader-demo" element={<LoaderDemo />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
