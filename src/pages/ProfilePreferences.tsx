@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Header, BottomNav } from "@/components/layout";
 
 const ProfilePreferences = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -107,9 +108,17 @@ const ProfilePreferences = () => {
         fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
         position: "relative",
         overflow: "hidden",
-        padding: "2rem 1rem",
+        paddingTop: "5rem",
+        paddingLeft: "1rem",
+        paddingRight: "1rem",
+        paddingBottom: "6rem", // Space for bottom nav on mobile
       }}
     >
+      {/* Unified Header */}
+      <Header />
+
+      {/* Bottom Navigation (Mobile only) */}
+      <BottomNav />
       {/* Ambient background elements */}
       <div
         style={{

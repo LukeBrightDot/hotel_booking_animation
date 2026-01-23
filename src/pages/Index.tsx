@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  VoiceAssistantLayout, 
   StateToggle,
   SearchModeToggle,
   type DemoState,
@@ -8,7 +7,8 @@ import {
   type Resort 
 } from '@/components/voice';
 import { BookingForm, type BookingData } from '@/components/booking';
-import { Mic, MicOff, Volume2, VolumeX, LogIn, UserPlus } from 'lucide-react';
+import { Header, BottomNav } from '@/components/layout';
+import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 import { ParticleVisualization } from '@/components/voice/ParticleVisualization';
 import { FloatingLocations } from '@/components/voice/FloatingLocations';
 import { AnimatedTranscript } from '@/components/voice/AnimatedTranscript';
@@ -135,76 +135,23 @@ const Index: React.FC = () => {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      padding: '5rem 1.5rem 0',
+      paddingTop: '4.5rem',
+      paddingLeft: '1.5rem',
+      paddingRight: '1.5rem',
+      paddingBottom: '5rem', // Space for bottom nav on mobile
     }}>
-      {/* Header */}
-      <header style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 50,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '1rem 1.5rem',
-        background: 'hsl(30 25% 98% / 0.8)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
-      }}>
-        {/* Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <div style={{
-            width: '2rem',
-            height: '2rem',
-            borderRadius: '9999px',
-            background: 'linear-gradient(135deg, hsl(15 55% 70%), hsl(35 45% 75%))',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-            <span style={{ color: 'hsl(30 25% 98%)', fontWeight: 600, fontSize: '0.875rem' }}>V</span>
-          </div>
-          <span style={{ fontSize: '1.125rem', letterSpacing: '0.05em', color: 'hsl(30 20% 15%)' }}>Voyage</span>
-        </div>
+      {/* Unified Header */}
+      <Header 
+        showModeToggle={true}
+        searchMode={searchMode}
+        onModeChange={setSearchMode}
+      />
 
-        {/* Center: Search Mode Toggle */}
-        <SearchModeToggle mode={searchMode} onModeChange={setSearchMode} />
-
-        {/* Auth buttons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <button style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            padding: '0.5rem 1rem',
-            fontSize: '0.875rem',
-            color: 'hsl(30 15% 45%)',
-            background: 'transparent',
-            border: 'none',
-            borderRadius: '0.5rem',
-            cursor: 'pointer',
-          }}>
-            <LogIn style={{ width: '1rem', height: '1rem' }} />
-            Login
-          </button>
-          <button style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            padding: '0.5rem 1rem',
-            fontSize: '0.875rem',
-            color: 'hsl(30 25% 98%)',
-            background: 'hsl(15 55% 70%)',
-            border: 'none',
-            borderRadius: '0.5rem',
-            cursor: 'pointer',
-          }}>
-            <UserPlus style={{ width: '1rem', height: '1rem' }} />
-            Join
-          </button>
-        </div>
-      </header>
+      {/* Bottom Navigation (Mobile only) */}
+      <BottomNav 
+        searchMode={searchMode}
+        onModeChange={setSearchMode}
+      />
 
       {/* Audio controls - fixed bottom right (only show in voice mode) */}
       {searchMode === 'voice' && (
