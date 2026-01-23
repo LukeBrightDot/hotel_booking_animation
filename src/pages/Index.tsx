@@ -153,9 +153,9 @@ const Index: React.FC = () => {
         onModeChange={setSearchMode}
       />
 
-      {/* Audio controls - fixed bottom right (only show in voice mode) */}
+      {/* Audio controls - fixed bottom right (only show in voice mode, above bottom nav on mobile) */}
       {searchMode === 'voice' && (
-        <div style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem', zIndex: 50, display: 'flex', gap: '0.75rem' }}>
+        <div className="fixed z-50 flex gap-3 bottom-20 right-4 md:bottom-6 md:right-6">
           <button
             onClick={() => setIsMicMuted(!isMicMuted)}
             style={{
