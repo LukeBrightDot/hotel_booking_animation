@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Mic, MicOff, Volume2, VolumeX, LogIn, UserPlus } from 'lucide-react';
+import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 import { ParticleVisualization } from './ParticleVisualization';
 import { AnimatedTranscript } from './AnimatedTranscript';
 import { FloatingLocations } from './FloatingLocations';
 import { ResortCard, type Resort } from './ResortCard';
+import { Header, BottomNav } from '@/components/layout';
 import { type VoiceActivityLevel } from '@/lib/animations';
 
 export type DemoState = 'idle' | 'listening' | 'speaking' | 'searching' | 'results';
@@ -124,82 +125,17 @@ export const VoiceAssistantLayout: React.FC<VoiceAssistantLayoutProps> = ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        padding: '5rem 1.5rem 0',
+        paddingTop: '4.5rem',
+        paddingLeft: '1.5rem',
+        paddingRight: '1.5rem',
+        paddingBottom: '5rem', // Space for bottom nav on mobile
       }}
     >
-      {/* Header */}
-      <header 
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 50,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '1rem 1.5rem',
-          background: 'hsl(30 25% 98% / 0.8)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-        }}
-      >
-        {/* Logo placeholder - left */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <div 
-            style={{
-              width: '2rem',
-              height: '2rem',
-              borderRadius: '9999px',
-              background: 'linear-gradient(135deg, hsl(15 55% 70%), hsl(35 45% 75%))',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <span style={{ color: 'hsl(30 25% 98%)', fontWeight: 600, fontSize: '0.875rem' }}>V</span>
-          </div>
-          <span style={{ fontSize: '1.125rem', letterSpacing: '0.05em', color: 'hsl(30 20% 15%)' }}>Voyage</span>
-        </div>
+      {/* Unified Header */}
+      <Header />
 
-        {/* Auth buttons - right */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <button
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.5rem 1rem',
-              fontSize: '0.875rem',
-              color: 'hsl(30 15% 45%)',
-              background: 'transparent',
-              border: 'none',
-              borderRadius: '0.5rem',
-              cursor: 'pointer',
-            }}
-          >
-            <LogIn style={{ width: '1rem', height: '1rem' }} />
-            Login
-          </button>
-          <button
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.5rem 1rem',
-              fontSize: '0.875rem',
-              color: 'hsl(30 25% 98%)',
-              background: 'hsl(15 55% 70%)',
-              border: 'none',
-              borderRadius: '0.5rem',
-              cursor: 'pointer',
-            }}
-          >
-            <UserPlus style={{ width: '1rem', height: '1rem' }} />
-            Join
-          </button>
-        </div>
-      </header>
+      {/* Bottom Navigation (Mobile only) */}
+      <BottomNav />
 
       {/* Audio controls - fixed bottom right */}
       <div style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem', zIndex: 50, display: 'flex', gap: '0.75rem' }}>
