@@ -553,15 +553,7 @@ const HotelDetail: React.FC = () => {
                 key={idx} 
                 room={room} 
                 index={idx}
-                onLoadRates={async (r) => {
-                  // Simulate API delay
-                  await new Promise(resolve => setTimeout(resolve, 800));
-                  return SAMPLE_RATES[r.roomType] || [];
-                }}
-                onSelectRate={(room, rate) => {
-                  console.log('Selected:', room.roomType, rate.rateName);
-                  // Navigate to booking page
-                }}
+                hotelId={hotelId}
               />
             ))}
           </div>
