@@ -1,24 +1,20 @@
-import React, { useState } from 'react';
-import { Bed, Users, Check, ChevronRight, ChevronDown, Award, Loader2 } from 'lucide-react';
-import { RateCard } from './RateCard';
-import type { RoomType, RoomRate } from '@/types/hotel';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Bed, Check, ChevronRight, Award } from 'lucide-react';
+import type { RoomType } from '@/types/hotel';
 
 interface ExpandableRoomCardProps {
   room: RoomType;
   index?: number;
-  onSelectRate?: (room: RoomType, rate: RoomRate) => void;
-  onLoadRates?: (room: RoomType) => Promise<RoomRate[]>;
+  hotelId?: string;
 }
 
 export const ExpandableRoomCard: React.FC<ExpandableRoomCardProps> = ({ 
   room, 
   index = 0,
-  onSelectRate,
-  onLoadRates,
+  hotelId = '1',
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [loadedRates, setLoadedRates] = useState<RoomRate[] | null>(null);
+  const navigate = useNavigate();
 
   const formatPrice = (amount: number, currency: string) => {
     return new Intl.NumberFormat('en-US', {
@@ -28,29 +24,15 @@ export const ExpandableRoomCard: React.FC<ExpandableRoomCardProps> = ({
     }).format(amount);
   };
 
-  const handleExpand = async () => {
-    if (!isExpanded && onLoadRates && !loadedRates) {
-      setIsLoading(true);
-      try {
-        const rates = await onLoadRates(room);
-        setLoadedRates(rates);
-      } catch (error) {
-        console.error('Failed to load rates:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    setIsExpanded(!isExpanded);
+  const handleViewAllRates = () => {
+    const roomId = encodeURIComponent(room.roomType.toLowerCase().replace(/\s+/g, '-'));
+    navigate(`/hotel/${hotelId}/room/${roomId}/rates`);
   };
 
-  const handleSelectRate = (rate: RoomRate) => {
-    if (onSelectRate) {
-      onSelectRate(room, rate);
-    }
+  const handleBookNow = () => {
+    // Book with best available rate - navigate to booking
+    navigate(`/booking?hotelId=${hotelId}&room=${encodeURIComponent(room.roomType)}`);
   };
-
-  // Use loaded rates if available, otherwise fall back to room.rates
-  const rates = loadedRates || room.rates || [];
 
   return (
     <div
@@ -66,19 +48,15 @@ export const ExpandableRoomCard: React.FC<ExpandableRoomCardProps> = ({
         opacity: 0,
       }}
       onMouseEnter={(e) => {
-        if (!isExpanded) {
-          e.currentTarget.style.background = 'hsl(30 20% 96% / 0.8)';
-          e.currentTarget.style.borderColor = 'hsl(15 55% 70% / 0.3)';
-        }
+        e.currentTarget.style.background = 'hsl(30 20% 96% / 0.8)';
+        e.currentTarget.style.borderColor = 'hsl(15 55% 70% / 0.3)';
       }}
       onMouseLeave={(e) => {
-        if (!isExpanded) {
-          e.currentTarget.style.background = 'hsl(30 20% 96% / 0.5)';
-          e.currentTarget.style.borderColor = 'hsl(30 15% 88% / 0.5)';
-        }
+        e.currentTarget.style.background = 'hsl(30 20% 96% / 0.5)';
+        e.currentTarget.style.borderColor = 'hsl(30 15% 88% / 0.5)';
       }}
     >
-      {/* Room Header - Always Visible */}
+      {/* Room Header */}
       <div style={{ padding: '1.5rem' }}>
         {/* Room Type Header */}
         <div style={{ marginBottom: '0.75rem' }}>
@@ -178,6 +156,7 @@ export const ExpandableRoomCard: React.FC<ExpandableRoomCardProps> = ({
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
           {/* Book Now - Primary CTA */}
           <button
+            onClick={handleBookNow}
             style={{
               width: '100%',
               padding: '0.875rem',
@@ -200,20 +179,13 @@ export const ExpandableRoomCard: React.FC<ExpandableRoomCardProps> = ({
               e.currentTarget.style.transform = 'translateY(0)';
               e.currentTarget.style.boxShadow = 'none';
             }}
-            onClick={() => {
-              // Book with the best/first rate
-              if (rates.length > 0) {
-                handleSelectRate(rates[0]);
-              }
-            }}
           >
             Book Now
           </button>
 
           {/* View All Rates - Secondary */}
           <button
-            onClick={handleExpand}
-            disabled={isLoading}
+            onClick={handleViewAllRates}
             style={{
               width: '100%',
               padding: '0.75rem',
@@ -239,54 +211,11 @@ export const ExpandableRoomCard: React.FC<ExpandableRoomCardProps> = ({
               e.currentTarget.style.color = 'hsl(30 15% 40%)';
             }}
           >
-            {isLoading ? (
-              <>
-                <Loader2 style={{ width: '1rem', height: '1rem', animation: 'spin 1s linear infinite' }} />
-                Loading rates...
-              </>
-            ) : (
-              <>
-                View All {room.rateCount} Rate{room.rateCount !== 1 ? 's' : ''}
-                {isExpanded ? (
-                  <ChevronDown style={{ width: '1rem', height: '1rem' }} />
-                ) : (
-                  <ChevronRight style={{ width: '1rem', height: '1rem' }} />
-                )}
-              </>
-            )}
+            View All {room.rateCount} Rate{room.rateCount !== 1 ? 's' : ''}
+            <ChevronRight style={{ width: '1rem', height: '1rem' }} />
           </button>
         </div>
       </div>
-
-      {/* Expanded Rates Section */}
-      {isExpanded && rates.length > 0 && (
-        <div style={{
-          borderTop: '1px solid hsl(30 15% 88%)',
-          background: 'hsl(30 15% 94%)',
-          padding: '1.25rem',
-        }}>
-          <div style={{
-            fontFamily: "'Cormorant Garamond', Georgia, serif",
-            fontSize: '1.125rem',
-            fontWeight: 400,
-            color: 'hsl(30 20% 20%)',
-            marginBottom: '1rem',
-          }}>
-            Available Rates ({rates.length})
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {rates.map((rate, idx) => (
-              <RateCard 
-                key={rate.rateId} 
-                rate={rate} 
-                index={idx}
-                onSelect={handleSelectRate}
-              />
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
