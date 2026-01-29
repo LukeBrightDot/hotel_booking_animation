@@ -1,8 +1,90 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, MapPin, Star, Award, Share2, Heart, Crown } from 'lucide-react';
-import { HotelImageGallery, RoomCard, HotelAmenities } from '@/components/hotel';
-import type { Hotel } from '@/types/hotel';
+import { HotelImageGallery, ExpandableRoomCard, HotelAmenities } from '@/components/hotel';
+import type { Hotel, RoomRate } from '@/types/hotel';
+
+// Sample rates data for demonstration
+const SAMPLE_RATES: Record<string, RoomRate[]> = {
+  'Deluxe Room': [
+    {
+      rateId: 'virtuoso-1',
+      rateName: 'Virtuoso Properties',
+      rateProvider: 'Virtuoso Properties',
+      isRefundable: true,
+      hasFreeCancellation: true,
+      cancellationPolicy: 'Free cancellation until 24 hours before check-in',
+      amountBeforeTax: 1173,
+      amountAfterTax: 1350,
+      currencyCode: 'USD',
+      partnerBenefits: ['Room Upgrade', 'Early Check-In', 'Late Check-Out', 'Breakfast Included', '$100 Credit', 'Welcome Amenity'],
+      roomAmenities: ['Internet access', 'Mini bar', 'City view'],
+      roomDetails: 'SUPERIOR KING BED. COURTYARD VIEW 360 SQFT FLRS 4 TO 12. LUXURIOUS ACCOMMODATIONS. EARLY CHECK-IN AND LATE CHECK-OUT BASED UPON ON AVAILABILITY. ONE CATEGORY UPGRADE, BASED ON AVAILABILITY AT TIME OF CHECK-IN.',
+    },
+    {
+      rateId: 'rosewood-1',
+      rateName: 'Rosewood Escapes',
+      rateProvider: 'Rosewood Escapes',
+      isRefundable: true,
+      hasFreeCancellation: true,
+      cancellationPolicy: 'Free cancellation until 48 hours before check-in',
+      amountBeforeTax: 1290,
+      amountAfterTax: 1467,
+      currencyCode: 'USD',
+      partnerBenefits: ['Breakfast Included', 'Late Check-Out'],
+      roomAmenities: ['Internet access', 'Marble bathroom', 'Shower'],
+      roomDetails: 'MADISON KING 375 SQ. FT. FLOORS 3-18 MODERN ART DECO STYLE. NATURAL LIGHT. MADISON AVENUE VIEWS. MARBLE BATHROOM WITH RAIN SHOWER.',
+    },
+    {
+      rateId: 'flexible-1',
+      rateName: 'Flexible Rate',
+      isRefundable: true,
+      hasFreeCancellation: true,
+      amountBeforeTax: 1525,
+      amountAfterTax: 1725,
+      currencyCode: 'USD',
+      roomAmenities: ['Internet access'],
+    },
+  ],
+  'Premier Room': [
+    {
+      rateId: 'virtuoso-2',
+      rateName: 'Virtuoso Properties',
+      rateProvider: 'Virtuoso Properties',
+      isRefundable: true,
+      hasFreeCancellation: true,
+      amountBeforeTax: 1400,
+      amountAfterTax: 1590,
+      currencyCode: 'USD',
+      partnerBenefits: ['Room Upgrade', 'Early Check-In', 'Breakfast Included'],
+      roomAmenities: ['Panoramic views', 'Separate living area', 'Premium mini bar'],
+    },
+    {
+      rateId: 'flexible-2',
+      rateName: 'Best Available Rate',
+      isRefundable: false,
+      hasFreeCancellation: false,
+      amountBeforeTax: 1200,
+      amountAfterTax: 1380,
+      currencyCode: 'USD',
+    },
+  ],
+  'Aman Suite': [
+    {
+      rateId: 'virtuoso-3',
+      rateName: 'Virtuoso Properties',
+      rateProvider: 'Virtuoso Properties',
+      isRefundable: true,
+      hasFreeCancellation: true,
+      amountBeforeTax: 2800,
+      amountAfterTax: 3190,
+      currencyCode: 'USD',
+      partnerBenefits: ['Room Upgrade', 'Early Check-In', 'Late Check-Out', 'Breakfast Included', '$100 Credit', 'Welcome Amenity'],
+      roomAmenities: ['Private furo bath', 'Butler service', 'Separate bedroom', 'Living room'],
+      roomDetails: 'Luxurious 157 sqm suite featuring separate bedroom and living room, private furo bath, and dedicated butler service with panoramic city views.',
+    },
+  ],
+};
 
 // Sample hotel data for demonstration
 const SAMPLE_HOTEL: Hotel = {
@@ -53,6 +135,8 @@ const SAMPLE_HOTEL: Hotel = {
       maxOccupancy: 2,
       guarantee: 'Deposit Required',
       cancellation: 'Free Cancellation',
+      isLuxuryPartner: true,
+      luxuryPartnerName: 'Virtuoso Properties',
     },
     {
       roomType: 'Premier Room',
@@ -456,16 +540,29 @@ const HotelDetail: React.FC = () => {
             color: 'hsl(30 20% 15%)',
             marginBottom: '1.5rem',
           }}>
-            Available Rooms
+            Available Rooms & Rates
           </h2>
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))',
             gap: '1.5rem',
           }}>
             {hotel.roomTypes.map((room, idx) => (
-              <RoomCard key={idx} room={room} index={idx} />
+              <ExpandableRoomCard 
+                key={idx} 
+                room={room} 
+                index={idx}
+                onLoadRates={async (r) => {
+                  // Simulate API delay
+                  await new Promise(resolve => setTimeout(resolve, 800));
+                  return SAMPLE_RATES[r.roomType] || [];
+                }}
+                onSelectRate={(room, rate) => {
+                  console.log('Selected:', room.roomType, rate.rateName);
+                  // Navigate to booking page
+                }}
+              />
             ))}
           </div>
         </section>
