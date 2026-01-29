@@ -13,6 +13,23 @@ export interface HotelAmenity {
   description: string;
 }
 
+// Individual rate within a room type
+export interface RoomRate {
+  rateId: string;
+  rateName: string;
+  rateProvider?: string; // e.g., "Virtuoso Properties", "Rosewood Escapes"
+  isRefundable: boolean;
+  hasFreeCancellation: boolean;
+  cancellationPolicy?: string;
+  amountBeforeTax: number;
+  amountAfterTax: number;
+  taxAmount?: number;
+  currencyCode: string;
+  partnerBenefits?: string[]; // e.g., ["Room Upgrade", "Early Check-In", "Breakfast Included"]
+  roomAmenities?: string[]; // e.g., ["Marble bathroom", "Shower", "Internet access"]
+  roomDetails?: string; // Long description text
+}
+
 export interface RoomType {
   roomType: string;
   description: string;
@@ -24,6 +41,9 @@ export interface RoomType {
   maxOccupancy: number;
   guarantee: string;
   cancellation: string;
+  rates?: RoomRate[]; // Multiple rates per room type
+  isLuxuryPartner?: boolean; // e.g., Virtuoso Properties
+  luxuryPartnerName?: string;
 }
 
 export interface Hotel {
