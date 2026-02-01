@@ -12,7 +12,8 @@ import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 import { ParticleVisualization } from '@/components/voice/ParticleVisualization';
 import { FloatingLocations } from '@/components/voice/FloatingLocations';
 import { AnimatedTranscript } from '@/components/voice/AnimatedTranscript';
-import { ResortCard } from '@/components/voice/ResortCard';
+import { AnimatedResortCard } from '@/components/voice/AnimatedResortCard';
+import { HotelCardSkeleton } from '@/components/voice/HotelCardSkeleton';
 import { type VoiceActivityLevel } from '@/lib/animations';
 
 // Demo transcripts for each state
@@ -91,18 +92,13 @@ const Index: React.FC = () => {
     }
   }, [demoState]);
 
-  // Handle results animation
+  // Handle results animation - now using AnimatedResortCard's built-in stagger
   useEffect(() => {
     if (demoState === 'results' && SAMPLE_RESORTS.length > 0) {
       setShowResults(false);
-      setVisibleResultCount(0);
       setTimeout(() => {
         setShowResults(true);
-        SAMPLE_RESORTS.forEach((_, index) => {
-          setTimeout(() => {
-            setVisibleResultCount(prev => prev + 1);
-          }, index * 200);
-        });
+        setVisibleResultCount(SAMPLE_RESORTS.length); // All cards visible, animation handled internally
       }, 300);
     } else {
       setShowResults(false);
@@ -292,23 +288,29 @@ const Index: React.FC = () => {
           transform: showResults ? 'translateY(0)' : 'translateY(2rem)',
           pointerEvents: showResults ? 'auto' : 'none',
         }}>
-          {demoState === 'results' && SAMPLE_RESORTS.length > 0 && (
+          {demoState === 'results' && (
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
               gap: '1.5rem',
             }}>
-              {SAMPLE_RESORTS.slice(0, visibleResultCount).map((resort, index) => (
-                <div 
+              {/* Show skeleton placeholders while loading */}
+              {!showResults && demoState === 'results' && (
+                <>
+                  {[1, 2, 3].map((i) => (
+                    <HotelCardSkeleton key={`skeleton-${i}`} />
+                  ))}
+                </>
+              )}
+              
+              {/* Animated resort cards */}
+              {showResults && SAMPLE_RESORTS.map((resort, index) => (
+                <AnimatedResortCard 
                   key={resort.id}
-                  style={{ 
-                    animation: 'fadeRise 0.8s ease-out forwards',
-                    animationDelay: `${index * 100}ms`,
-                    opacity: 0,
-                  }}
-                >
-                  <ResortCard resort={resort} index={index} />
-                </div>
+                  resort={resort} 
+                  index={index}
+                  isNewlyLoaded={true}
+                />
               ))}
             </div>
           )}
