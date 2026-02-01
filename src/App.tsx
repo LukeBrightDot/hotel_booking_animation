@@ -11,6 +11,7 @@ import LoaderDemo from "./pages/LoaderDemo";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import ProfilePreferences from "./pages/ProfilePreferences";
+import SearchResults from "./pages/SearchResults";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/search" element={<SearchResults />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/preferences" element={<ProfilePreferences />} />
