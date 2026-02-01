@@ -422,3 +422,87 @@
     transform: scale(1.05);
   }
 }
+
+/* Premium Hotel Card Skeleton Animations */
+@keyframes skeletonShimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  50%, 100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes skeletonBreathe {
+  0%, 100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes skeletonIconPulse {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(1.08);
+  }
+}
+
+/* Hotel card reveal animation */
+@keyframes hotelCardReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+    filter: blur(4px);
+  }
+  60% {
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* Content cascade animation */
+@keyframes contentCascade {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Gold glow pulse for new arrivals */
+@keyframes newArrivalGlow {
+  0% {
+    box-shadow: 0 0 0 0 hsl(var(--gold) / 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px 4px hsl(var(--gold) / 0.15);
+  }
+  100% {
+    box-shadow: 0 0 0 0 hsl(var(--gold) / 0);
+  }
+}
+
+.animate-hotel-reveal {
+  animation: hotelCardReveal 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-content-cascade {
+  animation: contentCascade 0.5s ease-out forwards;
+}
+
+.animate-new-arrival-glow {
+  animation: newArrivalGlow 1.5s ease-out forwards;
+}
