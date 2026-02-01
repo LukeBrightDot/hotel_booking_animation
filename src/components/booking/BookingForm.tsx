@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Calendar, MapPin, Users, Home, Search, ChevronDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
@@ -22,6 +23,7 @@ export interface BookingData {
 }
 
 export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = '' }) => {
+  const navigate = useNavigate();
   const [destination, setDestination] = useState('');
   const [checkIn, setCheckIn] = useState<Date | undefined>();
   const [checkOut, setCheckOut] = useState<Date | undefined>();
@@ -31,13 +33,25 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSearch, className = 
   const [showGuestsDropdown, setShowGuestsDropdown] = useState(false);
 
   const handleSearch = () => {
-    onSearch?.({
+    const searchData: BookingData = {
       destination,
       checkIn,
       checkOut,
       rooms,
       guests,
-    });
+    };
+    
+    onSearch?.(searchData);
+    
+    // Navigate to search results with params
+    const params = new URLSearchParams();
+    if (destination) params.set('destination', destination);
+    if (checkIn) params.set('checkIn', format(checkIn, 'yyyy-MM-dd'));
+    if (checkOut) params.set('checkOut', format(checkOut, 'yyyy-MM-dd'));
+    params.set('guests', guests.toString());
+    params.set('rooms', rooms.toString());
+    
+    navigate(`/search?${params.toString()}`);
   };
 
   const inputContainerStyle: React.CSSProperties = {

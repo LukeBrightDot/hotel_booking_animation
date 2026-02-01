@@ -86,13 +86,15 @@ export const AnimatedResortCard: React.FC<AnimatedResortCardProps> = ({
         }}
       >
         {resort.imageUrl ? (
-          <LuxuryImage
-            src={resort.imageUrl}
-            alt={resort.name}
-            aspectRatio="wide"
-            className="w-full h-full"
-            style={{ height: '100%', paddingBottom: 0 }}
-          />
+          <div className="w-full h-full overflow-hidden">
+            <LuxuryImage
+              src={resort.imageUrl}
+              alt={resort.name}
+              aspectRatio="wide"
+              className="w-full h-full transition-transform duration-700 group-hover:scale-110"
+              style={{ height: '100%', paddingBottom: 0 }}
+            />
+          </div>
         ) : (
           <div 
             className="w-full h-full flex items-center justify-center"
